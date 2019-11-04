@@ -12,7 +12,7 @@ const SubTaskModel = new Schema({
     type: String,
     required: true,
   },
-  isDone: {
+  IsDone: {
     type: Boolean,
     required: true,
   },
