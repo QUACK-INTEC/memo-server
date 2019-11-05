@@ -14,4 +14,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018,
   },
+  rules: {
+    "indent": ["error", 4]
+  },
 };
