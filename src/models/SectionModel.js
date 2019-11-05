@@ -4,24 +4,20 @@ const { Schema } = mongoose;
 const { Date, String } = Schema.Types;
 
 const SectionModel = new Schema({
-  ProfessorName: {
+  professorName: {
     type: String,
   },
-  Schedule: {
-    type: String,
-    required: true,
-  },
-  CreatedDate: {
-    type: Date,
-    default: Date.now,
-  },
-  ClassRoom: {
-    type: String,
-  },
-  Code: {
+  schedule: {
     type: String,
     required: true,
   },
-})
+  classRoom: {
+    type: String,
+  },
+  code: {
+    type: String,
+    required: true,
+  },
+}, { timestamps: true })
 
 module.exports = mongoose.model('Section', SectionModel);

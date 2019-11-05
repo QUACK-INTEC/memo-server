@@ -1,21 +1,17 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const { Date, String } = Schema.Types;
+const { String } = Schema.Types;
 
 const RankModel = new Schema({
-  CreatedDate: {
-    type: Date,
-    default: Date.now,
-  },
-  Level: {
+  level: {
     type: Number,
     required: true,
   },
-  BadgeUrl: {
+  badgeUrl: {
     type: String,
     required: true,
   },
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model('Rank', RankModel);

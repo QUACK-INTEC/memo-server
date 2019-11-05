@@ -4,18 +4,14 @@ const { Schema } = mongoose;
 const { Date, String, Boolean } = Schema.Types;
 
 const SubTaskModel = new Schema({
-  CreatedDate: {
-    type: Date,
-    default: Date.now,
-  },
-  Name: {
+  name: {
     type: String,
     required: true,
   },
-  IsDone: {
+  isDone: {
     type: Boolean,
     required: true,
   },
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model('SubTask', SubTaskModel);

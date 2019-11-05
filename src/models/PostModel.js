@@ -4,28 +4,25 @@ const { Schema } = mongoose;
 const { Date, String } = Schema.Types;
 
 const PostModel = new Schema({
-  CreatedDate: {
-    type: Date,
-    default: Date.now,
-  },
-  Title: {
+  title: {
     type: String,
     required: true,
   },
-  Description: {
+  description: {
     type: String,
     required: true,
   },
-  StartDate: {
+  startDate: {
     type: Date,
   },
-  EndDate: {
+  endDate: {
     type: Date,
   },
-  Type: {
+  type: {
     type: String,
+    enum: ['Event', 'Resource'],
     required: true,
   },
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model('Post', PostModel);
