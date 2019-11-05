@@ -10,7 +10,7 @@ const subjectModel = new Schema({
         required: true,
         unique: true,
     },
-    Code: {
+    code: {
         type: String,
         required: true,
         unique: true,
