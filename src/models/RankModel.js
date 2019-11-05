@@ -15,4 +15,4 @@ const RankModel = new Schema({
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Rank', RankModel);
+module.exports = mongoose.model('rank', RankModel);

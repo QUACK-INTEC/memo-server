@@ -21,4 +21,4 @@ const SectionModel = new Schema({
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Section', SectionModel);
+module.exports = mongoose.model('section', SectionModel);
