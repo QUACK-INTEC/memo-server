@@ -13,7 +13,5 @@ jobs:
         with:
           node-version: 12
       - run: npm install
-      - uses: tinovyatkin/action-eslint@v1
-        with:
-          repo-token: ${{secrets.GITHUB_TOKEN}}
-          check-name: eslint # this is the check name from above 👆 where to post annotations
+      - name: ESLint checks
+        uses: gimenete/eslint-action@1.0
