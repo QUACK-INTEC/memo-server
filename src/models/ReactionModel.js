@@ -9,4 +9,4 @@ const ReactionModel = new Schema({
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model('seaction', ReactionModel);
+module.exports = mongoose.model('reaction', ReactionModel);
