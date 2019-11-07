@@ -29,7 +29,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, msg: 'Something broke!' });
 });
 
-const SERVER_PORT = 3000;
+const SERVER_PORT = process.env.PORT || 3000;
 app.listen(SERVER_PORT, () => {
     winston.log('info', `🚀 Server running on port ${SERVER_PORT}.`);
 });

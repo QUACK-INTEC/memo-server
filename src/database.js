@@ -1,23 +1,23 @@
 const mongoose = require('mongoose');
+const winston = require('winston');
 
 class Database {
     constructor() {
-        this.server = '127.0.0.1:27017'; // REPLACE WITH YOUR DB SERVER
-        this.database = 'memo'; // REPLACE WITH YOUR DB NAME
+        this.mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/memo';
         this.connect();
     }
 
 
     connect() {
-        mongoose.connect(`mongodb://${this.server}/${this.database}`, {
+        mongoose.connect(this.mongoURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
             .then(() => {
-                console.log('Database connection successful');
+                winston.log('info', 'Database connection successful');
             })
             .catch(() => {
-                console.error('Database connection error');
+                winston.log('error', 'Database connection error');
             });
     }
 }
