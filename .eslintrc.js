@@ -15,6 +15,7 @@ module.exports = {
     ecmaVersion: 2018,
   },
   rules: {
-    "indent": ["error", 4]
+    "indent": ["error", 4],
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
   },
 };

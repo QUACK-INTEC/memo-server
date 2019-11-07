@@ -1,0 +1,3 @@
+module.exports = {
+    AUTH_SECRET: 'TEMP_AUTH_SECRET', // FIXME LOAD FROM ENV VARS
+};
