@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const { String } = Schema.Types;
+const { String, Boolean, ObjectId } = Schema.Types;
 
 const SectionModel = new Schema({
     professorName: {
@@ -17,6 +17,14 @@ const SectionModel = new Schema({
     },
     code: {
         type: String,
+        required: true,
+    },
+    active: {
+        type: Boolean,
+        default: true,
+    },
+    students: {
+        type: [ObjectId],
         required: true,
     },
 }, { timestamps: true });

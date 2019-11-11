@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 
-const { Schema } = mongoose;
+const { Schema, ObjectId } = mongoose;
 
 const ReactionModel = new Schema({
-    influence: {
+    value: {
         type: Number,
+        required: true,
+    },
+    author: {
+        type: ObjectId,
         required: true,
     },
 }, { timestamps: true });

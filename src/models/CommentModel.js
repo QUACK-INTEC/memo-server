@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ReactionModel = require('./ReactionModel');
 
 const { Schema } = mongoose;
 
@@ -12,6 +13,10 @@ const CommentModel = new Schema({
     author: {
         type: ObjectId,
         required: true,
+    },
+    reactions: {
+        type: [ReactionModel.schema],
+        required: false,
     },
 }, { timestamps: true });
 
