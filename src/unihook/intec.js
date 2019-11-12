@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require('axios').default;
 const cheerio = require('cheerio');
 
 const tough = require('tough-cookie');
@@ -45,6 +45,12 @@ const parseSchedule = (html) => {
     return classes;
 };
 
+const parseDiscrim = (html) => {
+    const $ = cheerio.load(html);
+    const DISCRIM_STRIP_PREFIX = 'Oferta Académica para el trimestre ';
+    return $('.content-header .section-title').text().substring(DISCRIM_STRIP_PREFIX.length);
+};
+
 const scrapeSchedule = async (username, password) => {
     const cookieJar = new tough.CookieJar();
 
@@ -59,10 +65,20 @@ const scrapeSchedule = async (username, password) => {
         txtUserPass: password,
     });
 
-    const schedule = parseSchedule(res.data);
-    return schedule;
+    if (res.request.path === '/Main/Inicio') {
+        const discrimRes = await intec.get(DISCRIM_ROUTE);
+        const discriminator = parseDiscrim(discrimRes.data);
+
+        const schedule = parseSchedule(res.data);
+
+        return { schedule, discriminator };
+    }
+
+    throw new Error('Invalid credentials');
 };
 
 module.exports = {
+    parseSchedule,
+    parseDiscrim,
     scrapeSchedule,
 };
