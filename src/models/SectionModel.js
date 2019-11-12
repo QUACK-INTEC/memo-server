@@ -23,11 +23,11 @@ const SectionModel = new Schema({
         type: Boolean,
         default: true,
     },
-    students: {
-        type: [ObjectId],
+    students: [{
+        type: ObjectId,
         required: true,
         ref: 'user',
-    },
+    }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('section', SectionModel);
