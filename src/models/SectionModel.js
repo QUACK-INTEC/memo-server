@@ -26,6 +26,7 @@ const SectionModel = new Schema({
     students: {
         type: [ObjectId],
         required: true,
+        ref: 'user',
     },
 }, { timestamps: true });
 

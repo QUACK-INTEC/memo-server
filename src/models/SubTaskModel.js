@@ -16,6 +16,7 @@ const SubTaskModel = new Schema({
     author: {
         type: ObjectId,
         required: true,
+        ref: 'user',
     },
 }, { timestamps: true });
 

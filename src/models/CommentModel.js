@@ -13,6 +13,7 @@ const CommentModel = new Schema({
     author: {
         type: ObjectId,
         required: true,
+        ref: 'user',
     },
     reactions: {
         type: [ReactionModel.schema],

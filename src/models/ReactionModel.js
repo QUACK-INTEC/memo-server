@@ -10,6 +10,7 @@ const ReactionModel = new Schema({
     author: {
         type: ObjectId,
         required: true,
+        ref: 'user',
     },
 }, { timestamps: true });
 
