@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 const { AUTH_SECRET } = require('../config/config');
 const UserService = require('../services/UserService');
 const { serializeUser } = require('../utils/serializers');
-const HttpResponse = require('./responses/HttpResponse');
+
+const BadRequestError = require('../constants/errors/BadRequestError');
 
 const genToken = (id, email) => jwt.sign({ id, email }, AUTH_SECRET, {
     expiresIn: 604800, // 1 week
@@ -17,11 +18,11 @@ const register = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
-        return new HttpResponse({ res }).badRequest(null, 'Missing fields');
+        throw new BadRequestError('Missing fields');
     }
 
     if (!validator.isEmail(email)) {
-        return new HttpResponse({ res }).badRequest(null, 'Invalid email address');
+        throw new BadRequestError('Missing fields');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -35,7 +36,7 @@ const register = async (req, res) => {
     };
 
     const newUser = await UserService.create(userInfo);
-    return new HttpResponse({ res }).ok({ user: serializeUser(newUser) }, 'Invalid email address');
+    return res.status(200).json({ user: serializeUser(newUser) });
 };
 
 const login = async (req, res) => {
