@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const { String, Boolean } = Schema.Types;
+const { String, Boolean, ObjectId } = Schema.Types;
 
 const SubTaskModel = new Schema({
     name: {
@@ -12,6 +12,11 @@ const SubTaskModel = new Schema({
     isDone: {
         type: Boolean,
         required: true,
+    },
+    author: {
+        type: ObjectId,
+        required: true,
+        ref: 'user',
     },
 }, { timestamps: true });
 

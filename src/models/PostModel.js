@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
+const ReactionModel = require('./ReactionModel');
+const CommentModel = require('./CommentModel');
+const AttachmentModel = require('./AttachmentModel');
 
 const { Schema } = mongoose;
 
-const { Date, String } = Schema.Types;
+
+const { Date, String, ObjectId } = Schema.Types;
 
 const PostModel = new Schema({
     title: {
@@ -23,6 +27,28 @@ const PostModel = new Schema({
         type: String,
         enum: ['Event', 'Resource'],
         required: true,
+    },
+    author: {
+        type: ObjectId,
+        required: true,
+        ref: 'user',
+    },
+    reactions: {
+        type: [ReactionModel.schema],
+        remove: false,
+    },
+    comments: {
+        type: [CommentModel.schema],
+        require: false,
+    },
+    attachments: {
+        type: [AttachmentModel.schema],
+        require: false,
+    },
+    section: {
+        type: ObjectId,
+        required: true,
+        ref: 'section',
     },
 }, { timestamps: true });
 

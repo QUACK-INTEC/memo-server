@@ -6,6 +6,8 @@ const { AUTH_SECRET } = require('../config/config');
 const UserService = require('../services/UserService');
 const { serializeUser } = require('../utils/serializers');
 
+const MissingFieldError = require('../constants/errors/MissingFieldError');
+
 const genToken = (id, email) => jwt.sign({ id, email }, AUTH_SECRET, {
     expiresIn: 604800, // 1 week
 });
@@ -16,13 +18,11 @@ const register = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
-        res.status(400).json({ success: false, msg: 'Missing fields' }); // FIXME Error standarization
-        return;
+        throw new MissingFieldError('Missing fields.');
     }
 
     if (!validator.isEmail(email)) {
-        res.status(400).json({ success: false, msg: 'Invalid email address' }); // FIXME Error standarization
-        return;
+        throw new MissingFieldError('Invalid email.');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -36,10 +36,7 @@ const register = async (req, res) => {
     };
 
     const newUser = await UserService.create(userInfo);
-    res.json({
-        success: true,
-        user: serializeUser(newUser),
-    });
+    return res.status(200).json({ user: serializeUser(newUser) });
 };
 
 const login = async (req, res) => {
