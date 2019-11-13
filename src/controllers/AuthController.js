@@ -18,11 +18,11 @@ const register = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
-        throw new MissingFieldError('Missing fields');
+        throw new MissingFieldError('Missing fields.');
     }
 
     if (!validator.isEmail(email)) {
-        throw new MissingFieldError('Missing fields');
+        throw new MissingFieldError('Invalid email.');
     }
 
     const salt = await bcrypt.genSalt(10);
