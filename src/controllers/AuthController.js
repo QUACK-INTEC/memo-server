@@ -6,7 +6,7 @@ const { AUTH_SECRET } = require('../config/config');
 const UserService = require('../services/UserService');
 const { serializeUser } = require('../utils/serializers');
 
-const BadRequestError = require('../constants/errors/BadRequestError');
+const MissingFieldError = require('../constants/errors/MissingFieldError');
 
 const genToken = (id, email) => jwt.sign({ id, email }, AUTH_SECRET, {
     expiresIn: 604800, // 1 week
@@ -18,11 +18,11 @@ const register = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
-        throw new BadRequestError('Missing fields');
+        throw new MissingFieldError('Missing fields');
     }
 
     if (!validator.isEmail(email)) {
-        throw new BadRequestError('Missing fields');
+        throw new MissingFieldError('Missing fields');
     }
 
     const salt = await bcrypt.genSalt(10);
