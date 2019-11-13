@@ -15,7 +15,28 @@ const serializeSection = (obj) => ({
     active: obj.active,
 });
 
+const serializeSectionStudent = (s) => ({
+    id: s._id,
+    firstName: s.firstName,
+    lastName: s.lastName,
+    email: s.email,
+    points: s.points,
+});
+
+const serializeSectionPost = (p) => ({
+    title: p.title,
+    description: p.description,
+    startDate: p.startDate,
+    endDate: p.endDate,
+    type: p.type,
+    author: p.author,
+    reactions: p.reactions,
+});
+
+
 module.exports = {
     serializeUser,
     serializeSection,
+    serializeSectionStudent,
+    serializeSectionPost,
 };
