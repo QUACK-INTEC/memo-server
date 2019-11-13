@@ -28,6 +28,11 @@ const SectionModel = new Schema({
         required: true,
         ref: 'user',
     }],
+    posts: [{
+        type: ObjectId,
+        required: true,
+        ref: 'post',
+    }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('section', SectionModel);

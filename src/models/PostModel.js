@@ -45,6 +45,11 @@ const PostModel = new Schema({
         type: [AttachmentModel.schema],
         require: false,
     },
+    section: {
+        type: ObjectId,
+        required: true,
+        ref: 'section',
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('post', PostModel);

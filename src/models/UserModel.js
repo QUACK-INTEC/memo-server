@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const { Number, String, Date } = Schema.Types;
+const {
+    Number, String, Date, ObjectId,
+} = Schema.Types;
 
 const UserModel = new Schema({
     firstName: {
@@ -32,6 +34,11 @@ const UserModel = new Schema({
     lastSync: {
         type: Date,
     },
+    sections: [{
+        type: ObjectId,
+        required: false,
+        ref: 'section',
+    }],
 }, {
     timestamps: true,
 });
