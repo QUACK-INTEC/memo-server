@@ -4,6 +4,8 @@ const cheerio = require('cheerio');
 const tough = require('tough-cookie');
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 
+const InvalidFieldError = require('../constants/errors/InvalidFieldError');
+
 axiosCookieJarSupport(axios);
 
 const BASE_URL = 'https://procesos.intec.edu.do';
@@ -30,9 +32,9 @@ const parseSchedule = (html) => {
         });
 
         const sectionInfo = {
-            code: row.children().first().text(),
-            section: row.children(':nth-child(3)').text(),
-            room: row.children(':nth-child(4)').text(),
+            code: row.children().first().text().replace(/ +(?= )/g, ''),
+            section: row.children(':nth-child(3)').text().replace(/ +(?= )/g, ''),
+            room: row.children(':nth-child(4)').text().replace(/ +(?= )/g, ''),
             name: row.children(':nth-child(2)').text(),
             professor: row.children(':nth-child(12)').text().replace(/ +(?= )/g, ''),
             schedule,
@@ -74,7 +76,7 @@ const scrapeSchedule = async (username, password) => {
         return { schedule, discriminator };
     }
 
-    throw new Error('Invalid credentials');
+    throw new InvalidFieldError('Invalid credentials');
 };
 
 module.exports = {

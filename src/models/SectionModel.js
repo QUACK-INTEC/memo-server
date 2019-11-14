@@ -4,12 +4,32 @@ const { Schema } = mongoose;
 
 const { String, Boolean, ObjectId } = Schema.Types;
 
+const ScheduleDaySchema = new Schema({
+    from: {
+        type: Number,
+        required: true,
+    },
+    to: {
+        type: Number,
+        required: true,
+    },
+});
+
+const ScheduleSchema = new Schema({
+    monday: ScheduleDaySchema,
+    tuesday: ScheduleDaySchema,
+    wednesday: ScheduleDaySchema,
+    thursday: ScheduleDaySchema,
+    friday: ScheduleDaySchema,
+    saturday: ScheduleDaySchema,
+});
+
 const SectionModel = new Schema({
     professorName: {
         type: String,
     },
     schedule: {
-        type: String,
+        type: ScheduleSchema,
         required: true,
     },
     classRoom: {
@@ -33,6 +53,15 @@ const SectionModel = new Schema({
         required: true,
         ref: 'post',
     }],
+    subject: {
+        type: ObjectId,
+        required: true,
+        ref: 'subject',
+    },
+    discriminator: {
+        type: String,
+        required: true,
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('section', SectionModel);

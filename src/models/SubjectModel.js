@@ -4,18 +4,22 @@ const SectionModel = require('./SectionModel.js');
 
 const { Schema } = mongoose;
 
-const { String } = Schema.Types;
+const { String, ObjectId } = Schema.Types;
 
 const subjectModel = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true,
     },
     code: {
         type: String,
         required: true,
         unique: true,
+    },
+    university: {
+        type: ObjectId,
+        ref: 'university',
+        required: true,
     },
     sections: {
         type: [SectionModel.schema],

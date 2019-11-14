@@ -12,6 +12,8 @@ class Database {
         mongoose.connect(this.mongoURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            useFindAndModify: false,
+            useCreateIndex: true,
         })
             .then(() => {
                 winston.log('info', 'Database connection successful');
