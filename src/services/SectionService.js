@@ -17,6 +17,15 @@ const findById = async (id) => {
     return result;
 };
 
+const updateOrCreate = async (sectionData) => {
+    const { code, subject, discriminator } = sectionData;
+    return SectionModel.findOneAndUpdate(
+        { code, subject, discriminator },
+        sectionData,
+        { upsert: true },
+    ).lean().exec();
+};
+
 const findSectionsStudents = async (id) => {
     const res = await SectionModel
         .findById(id).populate('students', 'firstName lastName email points').lean().exec();
@@ -33,9 +42,15 @@ const findSectionsPosts = async (id) => {
     return res.posts;
 };
 
+const joinSection = async (id, userId) => SectionModel.findByIdAndUpdate(id, {
+    $addToSet: { students: userId },
+});
+
 module.exports = {
     findMySections,
     findById,
     findSectionsStudents,
     findSectionsPosts,
+    updateOrCreate,
+    joinSection,
 };
