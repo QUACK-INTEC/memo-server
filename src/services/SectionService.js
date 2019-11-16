@@ -22,7 +22,7 @@ const updateOrCreate = async (sectionData) => {
     return SectionModel.findOneAndUpdate(
         { code, subject, discriminator },
         sectionData,
-        { upsert: true },
+        { new: true, upsert: true },
     ).lean().exec();
 };
 
