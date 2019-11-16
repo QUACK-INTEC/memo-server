@@ -9,6 +9,9 @@ const findByName = async (universityName) => {
     throw new InvalidFieldError('La universidad no existe');
 };
 
+const getAll = async () => UniversityModel.find().lean().exec();
+
 module.exports = {
     findByName,
+    getAll,
 };

@@ -42,10 +42,16 @@ const serializeSectionPost = (p) => ({
     reactions: p.reactions,
 });
 
+const serializeUniversity = (uni) => ({
+    id: uni._id,
+    title: uni.title,
+    syncCode: uni.name,
+});
 
 module.exports = {
     serializeUser,
     serializeSection,
     serializeSectionStudent,
     serializeSectionPost,
+    serializeUniversity,
 };

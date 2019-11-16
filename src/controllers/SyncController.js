@@ -4,7 +4,7 @@ const UniversityService = require('../services/UniversityService');
 const SubjectService = require('../services/SubjectService');
 const SectionService = require('../services/SectionService');
 
-const { serializeSection } = require('../utils/serializers');
+const { serializeSection, serializeUniversity } = require('../utils/serializers');
 
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
 const MissingFieldError = require('../constants/errors/MissingFieldError');
@@ -49,6 +49,12 @@ const sync = async (req, res) => {
     res.json({ sections: sections.map(serializeSection) });
 };
 
+const getUniversities = async (req, res) => {
+    const universities = await UniversityService.getAll();
+    res.json({ universities: universities.map(serializeUniversity) });
+};
+
 module.exports = {
     sync,
+    getUniversities,
 };
