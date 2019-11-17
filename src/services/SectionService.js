@@ -11,6 +11,10 @@ const findMySections = async (userId) => {
     return result;
 };
 
+const getCommonSections = async (firstUserId, secondUserId) => SectionModel.find({
+    students: { $all: [firstUserId, secondUserId] },
+});
+
 const findById = async (id) => {
     const result = await SectionModel
         .findById(id).lean().exec();
@@ -53,4 +57,5 @@ module.exports = {
     findSectionsPosts,
     updateOrCreate,
     joinSection,
+    getCommonSections,
 };

@@ -5,5 +5,6 @@ const router = express.Router();
 router.use('/auth', require('./auth'));
 router.use('/sections', require('./sections'));
 router.use('/sync', require('./sync'));
+router.use('/profile', require('./profile'));
 
 module.exports = router;
