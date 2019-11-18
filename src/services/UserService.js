@@ -1,5 +1,7 @@
 const { UserModel } = require('../models');
 
+const NotFoundError = require('../constants/errors/NotFoundError');
+
 const create = async (userInfo) => new UserModel(userInfo).save();
 
 const findById = async (userId) => {
@@ -7,7 +9,7 @@ const findById = async (userId) => {
     if (user) {
         return user;
     }
-    throw new Error('User not found'); // FIXME This needs to be standardized in some way
+    throw new NotFoundError('Usuario no encontrado');
 };
 
 const findOne = async (userInfo) => UserModel.findOne().findOne(userInfo).lean().exec();

@@ -1,5 +1,5 @@
 const serializeUser = (userObj) => ({
-    id: userObj.id,
+    id: userObj._id,
     email: userObj.email,
     firstName: userObj.firstName,
     lastName: userObj.lastName,
