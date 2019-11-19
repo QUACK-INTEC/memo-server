@@ -14,8 +14,13 @@ const findById = async (userId) => {
 
 const findOne = async (userInfo) => UserModel.findOne().findOne(userInfo).lean().exec();
 
+const updateAvatar = async (userId, imageUrl) => UserModel.findByIdAndUpdate(
+    userId, { avatarURL: imageUrl }, { new: true },
+).lean().exec();
+
 module.exports = {
     create,
     findById,
     findOne,
+    updateAvatar,
 };
