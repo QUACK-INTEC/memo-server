@@ -6,6 +6,19 @@ const serializeUser = (userObj) => ({
     points: userObj.points,
 });
 
+const serializePost = (p) => ({
+    id: p._id,
+    title: p.title,
+    description: p.description,
+    startDate: p.startDate,
+    endDate: p.endDate,
+    type: p.type,
+    author: p.author,
+    reactions: p.reactions,
+    comments: p.comments,
+    attachments: p.attachments,
+});
+
 const serializeSchedule = (obj) => ({
     monday: obj.monday ? { from: obj.monday.from, to: obj.monday.to } : undefined,
     tuesday: obj.tuesday ? { from: obj.tuesday.from, to: obj.tuesday.to } : undefined,
@@ -54,4 +67,5 @@ module.exports = {
     serializeSectionStudent,
     serializeSectionPost,
     serializeUniversity,
+    serializePost,
 };
