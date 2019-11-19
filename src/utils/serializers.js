@@ -28,6 +28,13 @@ const serializeSchedule = (obj) => ({
     saturday: obj.saturday ? { from: obj.saturday.from, to: obj.saturday.to } : undefined,
 });
 
+const serializeSubject = (obj) => ({
+    id: obj._id,
+    code: obj.code,
+    name: obj.name,
+    university: obj.university,
+});
+
 const serializeSection = (obj) => ({
     id: obj._id,
     professorName: obj.professorName,
@@ -35,6 +42,7 @@ const serializeSection = (obj) => ({
     classRoom: obj.classRoom,
     code: obj.code,
     active: obj.active,
+    subject: serializeSubject(obj.subject),
 });
 
 const serializeSectionStudent = (s) => ({
