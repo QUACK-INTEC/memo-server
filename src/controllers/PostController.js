@@ -5,6 +5,7 @@ const { serializePost } = require('../utils/serializers');
 
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
+const MissingFieldError = require('../constants/errors/MissingFieldError');
 
 const create = async (req, res) => {
     const {
@@ -16,13 +17,13 @@ const create = async (req, res) => {
         section,
         attachments,
     } = req.body;
-
-    if (type === 'Event' && !(new Date(endDate)).getDate()) {
-        throw new InvalidFieldError('Fecha de finalización no es válida');
+    if ((type === 'Event' && !endDate)) {
+        throw new MissingFieldError('Fecha de finalización es requerida');
     }
 
-    const students = await SectionService.findSectionsStudents(section);
-    if (!students.includes(req.user.id)) {
+    let students = await SectionService.findSectionsStudents(section);
+    students = students.map((s) => String(s._id));
+    if (!students.includes(String(req.user.id))) {
         throw new ForbiddenError('Usted no es parte de esta sección');
     }
 
@@ -59,7 +60,7 @@ const update = async (req, res) => {
     }
 
     const post = await PostService.findById(id);
-    if (post.author !== req.user.id) {
+    if (String(post.author) !== String(req.user.id)) {
         throw new ForbiddenError('Este post no le pertenece');
     }
 
@@ -93,7 +94,7 @@ const deletePost = async (req, res) => {
     const { id } = req.params;
 
     const post = await PostService.findById(id);
-    if (post.author !== req.user.id) {
+    if (String(post.author) !== String(req.user.id)) {
         throw new ForbiddenError('Este post no le pertenece');
     }
 
