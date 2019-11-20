@@ -7,6 +7,8 @@ const UserService = require('../services/UserService');
 const { serializeUser } = require('../utils/serializers');
 
 const MissingFieldError = require('../constants/errors/MissingFieldError');
+const InvalidFieldError = require('../constants/errors/InvalidFieldError');
+const UnauthorizedError = require('../constants/errors/UnauthorizedError');
 
 const genToken = (id, email) => jwt.sign({ id, email }, AUTH_SECRET, {
     expiresIn: 604800, // 1 week
@@ -18,11 +20,11 @@ const register = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
-        throw new MissingFieldError('Missing fields.');
+        throw new MissingFieldError('Faltan campos requeridos');
     }
 
     if (!validator.isEmail(email)) {
-        throw new MissingFieldError('Invalid email.');
+        throw new InvalidFieldError('Correo electrónico inválido');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -43,14 +45,12 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        res.status(400).json({ success: false, msg: 'Missing fields' });
-        return;
+        throw new MissingFieldError('Faltan campos requeridos');
     }
 
     const user = await UserService.findOne({ email });
     if (!user) {
-        res.status(401).json({ success: false, msg: 'User does not exist' });
-        return;
+        throw new UnauthorizedError('Usuario no encontrado');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -61,7 +61,7 @@ const login = async (req, res) => {
             user: serializeUser(user),
         });
     } else {
-        res.status(401).json({ success: false, msg: 'Wrong password' }); // FIXME Error standarization
+        throw new UnauthorizedError('La contraseña ingresada es incorrecta');
     }
 };
 
