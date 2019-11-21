@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { SectionModel } = require('../models');
-
+const NotFoundError = require('../constants/errors/NotFoundError');
 
 const findMySections = async (userId) => {
     const id = new mongoose.Types.ObjectId(userId);
@@ -50,9 +50,13 @@ const findSectionsPosts = async (id) => {
         .findById(id)
         .populate(
             'posts',
-            'title description startDate endDate type author',
+            'title description startDate endDate type author.user',
         ).lean().exec();
-    return res.posts;
+
+    if (!res) {
+        throw new NotFoundError('Esta sección no existe');
+    }
+    return res.posts || [];
 };
 
 const joinSection = async (id, userId) => SectionModel.findByIdAndUpdate(id, {
