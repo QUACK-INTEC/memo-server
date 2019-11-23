@@ -60,7 +60,9 @@ const serializeSectionPost = (p) => ({
     endDate: p.endDate,
     type: p.type,
     author: p.author,
+    section: p.section,
     reactions: p.reactions,
+    attachments: p.attachments,
 });
 
 const serializeUniversity = (uni) => ({
