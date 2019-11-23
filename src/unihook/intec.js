@@ -76,7 +76,7 @@ const scrapeSchedule = async (username, password) => {
         return { schedule, discriminator };
     }
 
-    throw new InvalidFieldError('Invalid credentials');
+    throw new InvalidFieldError('Credenciales invalidas');
 };
 
 module.exports = {

@@ -5,6 +5,7 @@ const ProfileController = require('../controllers/ProfileController.js');
 
 const router = express.Router();
 
+router.get('/', passport.authenticate('jwt', { session: false }), asyncHandler(ProfileController.getOwnProfile));
 router.get('/:id', passport.authenticate('jwt', { session: false }), asyncHandler(ProfileController.getProfile));
 
 module.exports = router;

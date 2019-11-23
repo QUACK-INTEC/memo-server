@@ -1,5 +1,6 @@
 const serializeUser = (userObj) => ({
     id: userObj._id,
+    avatarURL: userObj.avatarURL,
     email: userObj.email,
     firstName: userObj.firstName,
     lastName: userObj.lastName,
@@ -71,6 +72,13 @@ const serializeUniversity = (uni) => ({
     syncCode: uni.name,
 });
 
+const serializeAttachment = (att) => ({
+    id: att._id,
+    fileURL: att.fileURL,
+    name: att.name,
+});
+
+
 module.exports = {
     serializeUser,
     serializeSection,
@@ -78,4 +86,5 @@ module.exports = {
     serializeSectionPost,
     serializeUniversity,
     serializePost,
+    serializeAttachment,
 };
