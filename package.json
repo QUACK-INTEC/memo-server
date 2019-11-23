@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/QUACK-INTEC/memo-server#readme",
   "dependencies": {
+    "aws-sdk": "^2.573.0",
     "axios": "^0.19.0",
     "axios-cookiejar-support": "^0.5.0",
     "bcrypt": "^3.0.6",
@@ -28,6 +29,8 @@
     "express-async-handler": "^1.1.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.7",
+    "multer": "^1.4.2",
+    "multer-s3": "^2.9.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "tough-cookie": "^3.0.1",

@@ -2,15 +2,19 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const { String } = Schema.Types;
+const { String, ObjectId } = Schema.Types;
 
 const AttachmentModel = new Schema({
     name: {
         type: String,
-        required: true,
     },
     fileURL: {
         type: String,
+        required: true,
+    },
+    uploadedBy: {
+        type: ObjectId,
+        ref: 'user',
         required: true,
     },
 }, { timestamps: true });
