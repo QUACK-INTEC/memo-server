@@ -39,9 +39,19 @@ const sectionPosts = async (req, res) => {
     });
 };
 
+const sectionResources = async (req, res) => {
+    const { id } = req.params;
+    const posts = await SectionService.findSectionsResources(id);
+    res.json({
+        success: true,
+        data: posts.map((p) => (serializeSectionPost(p))),
+    });
+};
+
 module.exports = {
     getMySections,
     sectionDetails,
     sectionStudents,
     sectionPosts,
+    sectionResources,
 };
