@@ -3,7 +3,11 @@ const NotFoundError = require('../constants/errors/NotFoundError');
 
 const findById = async (id) => {
     const result = await PostModel
-        .findById(id).lean().exec();
+        .findById(id)
+        .populate({ path: 'comments.author', model: 'user' })
+        .populate({ path: 'reactions.author', model: 'user' })
+        .lean()
+        .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
