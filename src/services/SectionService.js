@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const { SectionModel } = require('../models');
-
+const { SectionModel, PostModel } = require('../models');
 
 const findMySections = async (userId) => {
     const id = new mongoose.Types.ObjectId(userId);
@@ -46,13 +45,12 @@ const findSectionsStudents = async (id) => {
 };
 
 const findSectionsPosts = async (id) => {
-    const res = await SectionModel
-        .findById(id)
-        .populate(
-            'posts',
-            'title description startDate endDate type author',
-        ).lean().exec();
-    return res.posts;
+    const posts = await PostModel
+        .find({ section: id })
+        .lean().exec();
+
+
+    return posts;
 };
 
 const joinSection = async (id, userId) => SectionModel.findByIdAndUpdate(id, {
