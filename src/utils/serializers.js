@@ -55,6 +55,7 @@ const serializeSectionStudent = (s) => ({
 });
 
 const serializeSectionPost = (p) => ({
+    id: p._id,
     title: p.title,
     description: p.description,
     startDate: p.startDate,
