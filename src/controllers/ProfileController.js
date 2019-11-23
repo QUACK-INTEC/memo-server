@@ -3,6 +3,14 @@ const SectionService = require('../services/SectionService');
 
 const { serializeUser, serializeSection } = require('../utils/serializers');
 
+const getOwnProfile = async (req, res) => {
+    const user = await UserService.findById(req.user.id);
+
+    res.json({
+        user: serializeUser(user),
+    });
+};
+
 const getProfile = async (req, res) => {
     const { id } = req.params;
 
@@ -17,4 +25,5 @@ const getProfile = async (req, res) => {
 
 module.exports = {
     getProfile,
+    getOwnProfile,
 };
