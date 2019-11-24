@@ -1,0 +1,5 @@
+{
+    "name": "Memo API Server",
+    "repository": "https://github.com/QUACK-INTEC/memo-server",
+    "addons": ["mongolab"]
+}

@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     commonjs: true,
     es6: true,
+    mocha: true
   },
   extends: [
     'airbnb-base',
@@ -15,6 +16,7 @@ module.exports = {
     ecmaVersion: 2018,
   },
   rules: {
-    "indent": ["error", 4]
+    "indent": ["error", 4],
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
   },
 };
