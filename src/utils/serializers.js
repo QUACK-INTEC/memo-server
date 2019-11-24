@@ -7,17 +7,28 @@ const serializeUser = (userObj) => ({
     points: userObj.points,
 });
 
-const serializePost = (p) => ({
+const serializeAttachment = (att) => ({
+    id: att._id,
+    fileURL: att.fileURL,
+    name: att.name,
+});
+
+const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
-    description: p.description,
     startDate: p.startDate,
     endDate: p.endDate,
     type: p.type,
-    author: p.author,
+    author: serializeUser(p.author),
+    isPublic: p.isPublic,
+});
+
+const serializePost = (p) => ({
+    ...serializeSimplePost(p),
+    description: p.description,
     reactions: p.reactions,
     comments: p.comments,
-    attachments: p.attachments,
+    attachments: p.attachments.map(serializeAttachment),
 });
 
 const serializeSchedule = (obj) => ({
@@ -54,29 +65,10 @@ const serializeSectionStudent = (s) => ({
     points: s.points,
 });
 
-const serializeSectionPost = (p) => ({
-    id: p._id,
-    title: p.title,
-    description: p.description,
-    startDate: p.startDate,
-    endDate: p.endDate,
-    type: p.type,
-    author: p.author,
-    section: p.section,
-    reactions: p.reactions,
-    attachments: p.attachments,
-});
-
 const serializeUniversity = (uni) => ({
     id: uni._id,
     title: uni.title,
     syncCode: uni.name,
-});
-
-const serializeAttachment = (att) => ({
-    id: att._id,
-    fileURL: att.fileURL,
-    name: att.name,
 });
 
 
@@ -84,8 +76,8 @@ module.exports = {
     serializeUser,
     serializeSection,
     serializeSectionStudent,
-    serializeSectionPost,
     serializeUniversity,
+    serializeSimplePost,
     serializePost,
     serializeAttachment,
 };

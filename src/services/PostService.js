@@ -3,7 +3,11 @@ const NotFoundError = require('../constants/errors/NotFoundError');
 
 const findById = async (id) => {
     const result = await PostModel
-        .findById(id).lean().exec();
+        .findById(id)
+        .populate('author')
+        .populate('attachments')
+        .lean()
+        .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
@@ -19,7 +23,7 @@ const update = async (postData) => {
     return PostModel.findOneAndUpdate(
         { _id: id },
         postData,
-        { new: true, upsert: true },
+        { new: true },
     ).lean().exec();
 };
 
