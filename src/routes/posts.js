@@ -10,4 +10,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), asyncHandler(
 router.put('/:id', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.update));
 router.delete('/:id', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.deletePost));
 
+router.post('/:postId/subtask', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.addSubtask));
+router.put('/:postId/subtask/:taskId', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.updateSubtask));
+router.delete('/:postId/subtask/:taskId', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.deleteSubtask));
+
 module.exports = router;

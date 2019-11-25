@@ -13,6 +13,12 @@ const serializeAttachment = (att) => ({
     name: att.name,
 });
 
+const serializeTask = (task) => ({
+    id: task._id,
+    name: task.name,
+    isDone: task.isDone,
+});
+
 const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
@@ -29,6 +35,7 @@ const serializePost = (p) => ({
     reactions: p.reactions,
     comments: p.comments,
     attachments: p.attachments.map(serializeAttachment),
+    subtasks: p.subtasks.map(serializeTask),
 });
 
 const serializeSchedule = (obj) => ({
@@ -80,4 +87,5 @@ module.exports = {
     serializeSimplePost,
     serializePost,
     serializeAttachment,
+    serializeTask,
 };
