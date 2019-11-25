@@ -44,12 +44,17 @@ const findSectionsStudents = async (id) => {
     return res.students;
 };
 
-const findSectionsPosts = async (id) => {
+const findSectionsPosts = async (id, currentUserId) => {
     const posts = await PostModel
-        .find({ section: id })
+        .find({
+            section: id,
+            $or: [
+                { isPublic: true },
+                { isPublic: false, author: currentUserId },
+            ],
+        })
+        .populate('author')
         .lean().exec();
-
-
     return posts;
 };
 

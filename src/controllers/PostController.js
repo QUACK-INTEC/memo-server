@@ -16,6 +16,7 @@ const create = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
     } = req.body;
     if ((type === 'Event' && !endDate)) {
         throw new MissingFieldError('Fecha de finalización es requerida');
@@ -35,11 +36,12 @@ const create = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
         author: req.user.id,
     });
     res.json({
         success: true,
-        data: post,
+        data: serializePost(post),
     });
 };
 
@@ -53,6 +55,7 @@ const update = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
     } = req.body;
 
     if (type === 'Event' && !(new Date(endDate)).getDate()) {
@@ -73,11 +76,12 @@ const update = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
         author: req.user.id,
     });
     res.json({
         success: true,
-        data: updated,
+        data: serializePost(updated),
     });
 };
 
