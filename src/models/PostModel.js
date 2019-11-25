@@ -56,4 +56,10 @@ const PostModel = new Schema({
     },
 }, { timestamps: true });
 
+PostModel.virtual('subtasks', {
+    ref: 'subTask',
+    localField: '_id',
+    foreignField: 'post',
+});
+
 module.exports = mongoose.model('post', PostModel);
