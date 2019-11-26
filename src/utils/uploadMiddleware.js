@@ -40,7 +40,7 @@ const uploadProfile = multer({
         },
     }),
     fileFilter: (req, file, cb) => {
-        if (!file.originalname.toLower().match(/\.(jpg|jpeg|png|gif)$/)) {
+        if (!file.originalname || !file.originalname.toLower().match(/\.(jpg|jpeg|png|gif)$/)) {
             winston.log('error', `Non-matching filename: ${file.originalname}`);
             cb(new InvalidFieldError('Solo puede subir archivos de imagen como foto de perfil'));
         } else {
