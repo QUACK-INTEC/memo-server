@@ -39,15 +39,15 @@ const uploadProfile = multer({
             cb(null, `memo/profile/${req.user.id}`);
         },
     }),
-    fileFilter: (req, file, cb) => {
-        winston.log('info', `filename: ${file.originalname}`);
-        if (!file.originalname || !file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+//     fileFilter: (req, file, cb) => {
+//         winston.log('info', `filename: ${file.originalname}`);
+//         if (!file.originalname || !file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
             
-            cb(new InvalidFieldError('Solo puede subir archivos de imagen como foto de perfil'));
-        } else {
-            cb(null, true);
-        }
-    },
+//             cb(new InvalidFieldError('Solo puede subir archivos de imagen como foto de perfil'));
+//         } else {
+//             cb(null, true);
+//         }
+//     },
 }).single('file');
 
 module.exports = {
