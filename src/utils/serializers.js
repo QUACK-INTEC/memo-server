@@ -35,7 +35,7 @@ const serializePost = (p) => ({
     reactions: p.reactions,
     comments: p.comments,
     attachments: p.attachments.map(serializeAttachment),
-    subtasks: p.subtasks.map(serializeTask),
+    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : undefined,
 });
 
 const serializeSchedule = (obj) => ({
