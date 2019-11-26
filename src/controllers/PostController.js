@@ -1,7 +1,7 @@
 
 const SectionService = require('../services/SectionService');
 const PostService = require('../services/PostService');
-const { serializePost } = require('../utils/serializers');
+const { serializePost, serializeTask } = require('../utils/serializers');
 
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
@@ -16,6 +16,7 @@ const create = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
     } = req.body;
     if ((type === 'Event' && !endDate)) {
         throw new MissingFieldError('Fecha de finalización es requerida');
@@ -35,11 +36,12 @@ const create = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
         author: req.user.id,
     });
     res.json({
         success: true,
-        data: post,
+        data: serializePost(post),
     });
 };
 
@@ -53,6 +55,7 @@ const update = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
     } = req.body;
 
     if (type === 'Event' && !(new Date(endDate)).getDate()) {
@@ -73,17 +76,18 @@ const update = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
         author: req.user.id,
     });
     res.json({
         success: true,
-        data: updated,
+        data: serializePost(updated),
     });
 };
 
 const details = async (req, res) => {
     const { id } = req.params;
-    const data = await PostService.findById(id);
+    const data = await PostService.findById(id, req.user.id);
     res.json({
         success: true,
         data: serializePost(data),
@@ -105,9 +109,60 @@ const deletePost = async (req, res) => {
     });
 };
 
+const addSubtask = async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+        throw new MissingFieldError('El nombre de la tarea es requerida!');
+    }
+
+    const task = await PostService.addSubtask({
+        name,
+        post: req.params.postId,
+        author: req.user.id,
+    });
+    res.json({
+        success: true,
+        task: serializeTask(task),
+    });
+};
+
+const updateSubtask = async (req, res) => {
+    const { postId, taskId } = req.params;
+    const { isDone } = req.body;
+
+    if (isDone === undefined) {
+        throw new MissingFieldError('Debe especificar si la tarea fue completada o no');
+    }
+
+    const taskData = {
+        _id: taskId,
+        post: postId,
+        author: req.user.id,
+        isDone,
+    };
+
+    const updatedTask = await PostService.updateSubtask(taskData);
+
+    res.json({
+        success: true,
+        task: serializeTask(updatedTask),
+    });
+};
+
+const deleteSubtask = async (req, res) => {
+    const { postId, taskId } = req.params;
+    res.json({
+        success: await PostService.deleteSubtask(taskId, postId, req.user.id),
+    });
+};
+
 module.exports = {
     create,
     update,
     details,
     deletePost,
+    addSubtask,
+    updateSubtask,
+    deleteSubtask,
 };
