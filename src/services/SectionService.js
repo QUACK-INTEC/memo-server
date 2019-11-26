@@ -54,7 +54,9 @@ const findSectionsPosts = async (id, currentUserId) => {
             ],
         })
         .populate('author')
-        .lean().exec();
+        .populate({ path: 'reactions.author', model: 'user' })
+        .lean()
+        .exec();
     return posts;
 };
 

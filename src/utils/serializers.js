@@ -31,18 +31,19 @@ const serializeComment = (c) => ({
 const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
+    section: p.section,
     startDate: p.startDate,
     endDate: p.endDate,
     type: p.type,
-    author: serializeUser(p.author),
+    author: p.author && serializeUser(p.author),
     currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
     isPublic: p.isPublic,
+    score: p.reactions.reduce(totalReactions, 0),
 });
 
 const serializePost = (p) => ({
     ...serializeSimplePost(p),
     description: p.description,
-    score: p.reactions.reduce(totalReactions, 0),
     comments: p.comments.map(serializeComment),
     attachments: p.attachments.map(serializeAttachment),
     subtasks: p.subtasks.map(serializeTask),

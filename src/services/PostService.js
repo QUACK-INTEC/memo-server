@@ -13,20 +13,18 @@ const findById = async (id, userId) => {
             path: 'subtasks',
             match: { author: userId },
         })
-        .lean()
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
-    console.log(result.reactions);
-    return {
-        ...result,
-        currentUserReaction: result.reactions.find((r) => String(r.author._id) === String(userId)),
-        comments: result.comments.map((comment) => ({
-            ...comment,
-            currentUserReaction: comment.reactions.find((r) => String(r.author._id) === String(userId)),
-        })),
-    };
+    result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
+
+    result.comments = result.comments.map((comment) => ({
+        ...comment,
+        currentUserReaction:
+            comment.reactions.find((r) => String(r.author._id) === String(userId)),
+    }));
+    return result;
 };
 
 const create = async (data) => {
