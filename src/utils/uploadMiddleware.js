@@ -1,6 +1,7 @@
 const aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
+const winston = require('winston');
 
 const { AWS_S3_BUCKET_NAME, AWS_S3_ENDPOINT } = require('../config/config');
 
@@ -39,7 +40,8 @@ const uploadProfile = multer({
         },
     }),
     fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        if (!file.originalname.toLower().match(/\.(jpg|jpeg|png|gif)$/)) {
+            winston.log('error', `Non-matching filename: ${file.originalname}`);
             cb(new InvalidFieldError('Solo puede subir archivos de imagen como foto de perfil'));
         } else {
             cb(null, true);
