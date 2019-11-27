@@ -40,6 +40,7 @@ const serializeSimplePost = (p) => ({
     currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
     isPublic: p.isPublic,
     score: p.reactions.reduce(totalReactions, 0),
+    createdAt: p.createdAt,
 });
 
 const serializePost = (p) => ({
