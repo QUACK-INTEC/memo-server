@@ -24,10 +24,11 @@ const totalReactions = (total, current) => total + current.value;
 const serializeComment = (c) => ({
     id: c._id,
     body: c.body,
-    score: c.reactions.reduce(totalReactions, 0),
+    score: c.reactions ? c.reactions.reduce(totalReactions, 0) : 0,
     currentUserReaction: c.currentUserReaction && c.currentUserReaction.value,
     author: serializeUser(c.author),
 });
+
 const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
@@ -99,4 +100,5 @@ module.exports = {
     serializePost,
     serializeAttachment,
     serializeTask,
+    serializeComment,
 };

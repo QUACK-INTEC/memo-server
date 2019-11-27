@@ -1,7 +1,7 @@
 
 const SectionService = require('../services/SectionService');
 const PostService = require('../services/PostService');
-const { serializePost, serializeTask } = require('../utils/serializers');
+const { serializePost, serializeTask, serializeComment } = require('../utils/serializers');
 
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
@@ -184,6 +184,29 @@ const deleteSubtask = async (req, res) => {
     });
 };
 
+const addComment = async (req, res) => {
+    const { body } = req.body;
+
+    if (!body) {
+        throw new MissingFieldError('Debe especificar el mensaje del comentario!');
+    }
+
+    const comment = await PostService.addComment(req.params.postId, req.user.id, body);
+
+    res.json({
+        success: true,
+        comment: serializeComment(comment),
+    });
+};
+
+const deleteComment = async (req, res) => {
+    const { postId, commentId } = req.params;
+
+    res.json({
+        success: await PostService.deleteComment(postId, req.user.id, commentId),
+    });
+};
+
 module.exports = {
     create,
     update,
@@ -195,4 +218,6 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    addComment,
+    deleteComment,
 };
