@@ -45,8 +45,8 @@ const serializeSimplePost = (p) => ({
 const serializePost = (p) => ({
     ...serializeSimplePost(p),
     description: p.description,
-    comments: p.comments.map(serializeComment),
-    attachments: p.attachments.map(serializeAttachment),
+    comments: p.comments ? p.comments.map(serializeComment) : undefined,
+    attachments: p.attachments ? p.attachments.map(serializeAttachment) : undefined,
     subtasks: p.subtasks ? p.subtasks.map(serializeTask) : undefined,
 });
 

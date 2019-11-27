@@ -63,7 +63,7 @@ const update = async (req, res) => {
     }
 
     const post = await PostService.findById(id);
-    if (String(post.author) !== String(req.user.id)) {
+    if (String(post.author._id) !== String(req.user.id)) {
         throw new ForbiddenError('Este post no le pertenece');
     }
 
@@ -98,7 +98,7 @@ const deletePost = async (req, res) => {
     const { id } = req.params;
 
     const post = await PostService.findById(id);
-    if (String(post.author) !== String(req.user.id)) {
+    if (String(post.author._id) !== String(req.user.id)) {
         throw new ForbiddenError('Este post no le pertenece');
     }
 
