@@ -41,6 +41,46 @@ const update = async (postData) => {
     ).lean().exec();
 };
 
+const resetVote = async (id, userId) => {
+    const post = await PostModel
+        .findById(id)
+        .exec();
+    if (!post) {
+        throw new NotFoundError('Post no encontrado');
+    }
+    const result = PostModel.update(
+        { _id: id },
+        {
+            $pull: {
+                reactions: {
+                    author: userId,
+                },
+            },
+        },
+    ).lean().exec();
+    return result;
+};
+
+
+const changeVote = async (id, userId, value) => {
+    await resetVote(id, userId);
+    const result = PostModel.update(
+        { _id: id },
+        {
+            $push: {
+                reactions: {
+                    author: userId,
+                    value,
+                },
+            },
+        },
+    ).lean().exec();
+    return result;
+};
+
+const upVote = async (id, userId) => changeVote(id, userId, 1);
+const downVote = async (id, userId) => changeVote(id, userId, -1);
+
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
 
 const addSubtask = async (data) => new SubTaskModel(data).save();
@@ -81,4 +121,7 @@ module.exports = {
     addSubtask,
     updateSubtask,
     deleteSubtask,
+    upVote,
+    downVote,
+    resetVote,
 };
