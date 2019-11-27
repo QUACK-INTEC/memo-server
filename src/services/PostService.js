@@ -4,6 +4,9 @@ const NotFoundError = require('../constants/errors/NotFoundError');
 const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
+        .populate({ path: 'comments.author', model: 'user' })
+        .populate({ path: 'comments.reactions.author', model: 'user' })
+        .populate({ path: 'reactions.author', model: 'user' })
         .populate('author')
         .populate('attachments')
         .populate({
@@ -14,6 +17,13 @@ const findById = async (id, userId) => {
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
+    result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
+
+    result.comments = result.comments.map((comment) => ({
+        ...comment,
+        currentUserReaction:
+            comment.reactions.find((r) => String(r.author._id) === String(userId)),
+    }));
     return result;
 };
 

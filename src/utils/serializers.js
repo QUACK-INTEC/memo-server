@@ -19,21 +19,32 @@ const serializeTask = (task) => ({
     isDone: task.isDone,
 });
 
+const totalReactions = (total, current) => total + current.value;
+
+const serializeComment = (c) => ({
+    id: c._id,
+    body: c.body,
+    score: c.reactions.reduce(totalReactions, 0),
+    currentUserReaction: c.currentUserReaction && c.currentUserReaction.value,
+    author: serializeUser(c.author),
+});
 const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
+    section: p.section,
     startDate: p.startDate,
     endDate: p.endDate,
     type: p.type,
-    author: serializeUser(p.author),
+    author: p.author && serializeUser(p.author),
+    currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
     isPublic: p.isPublic,
+    score: p.reactions.reduce(totalReactions, 0),
 });
 
 const serializePost = (p) => ({
     ...serializeSimplePost(p),
     description: p.description,
-    reactions: p.reactions,
-    comments: p.comments,
+    comments: p.comments.map(serializeComment),
     attachments: p.attachments.map(serializeAttachment),
     subtasks: p.subtasks ? p.subtasks.map(serializeTask) : undefined,
 });
