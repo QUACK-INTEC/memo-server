@@ -1,5 +1,7 @@
+const mongoose = require('mongoose');
 const { PostModel, SubTaskModel } = require('../models');
 const NotFoundError = require('../constants/errors/NotFoundError');
+const ForbiddenError = require('../constants/errors/ForbiddenError');
 
 const findById = async (id, userId) => {
     const result = await PostModel
@@ -113,6 +115,54 @@ const deleteSubtask = async (id, postId, userId) => {
     throw new NotFoundError('Tarea no encontrada para este usuario');
 };
 
+const addComment = async (postId, userId, body) => {
+    const comment = {
+        _id: mongoose.Types.ObjectId(),
+        author: userId,
+        body,
+    };
+
+    const post = await PostModel.findByIdAndUpdate(postId, {
+        $push: {
+            comments: comment,
+        },
+    }).lean().exec();
+
+    if (!post) {
+        throw new NotFoundError('Publicacion no encontrada');
+    }
+
+    return comment;
+};
+
+const deleteComment = async (postId, authorId, commentId) => {
+    const post = await PostModel.findById(postId).exec();
+
+    if (!post) {
+        throw new NotFoundError('Publicacion no encontrada');
+    }
+
+    const comment = post.comments.id(commentId);
+
+    if (!comment) {
+        throw new NotFoundError('Comentario no encontrado');
+    }
+
+    if (comment.author.toString() !== authorId.toString()) {
+        throw new ForbiddenError('Este comentario no le pertenece!');
+    }
+
+    const updateRes = await post.update({
+        $pull: {
+            comments: {
+                _id: commentId,
+            },
+        },
+    });
+
+    return !!(updateRes.ok && updateRes.nModified);
+};
+
 module.exports = {
     create,
     findById,
@@ -124,4 +174,6 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    addComment,
+    deleteComment,
 };
