@@ -21,7 +21,7 @@ const getPermanentResources = async (subjectId) => {
 
     const sectionIds = sections.map((s) => s._id);
     const posts = await PostModel.find({
-        section: { $in: sectionIds }, type: 'Resource',
+        section: { $in: sectionIds },
     })
         .populate('section')
         .populate('author')

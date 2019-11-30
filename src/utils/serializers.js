@@ -39,15 +39,16 @@ const serializeSimplePost = (p) => ({
     author: p.author && serializeUser(p.author),
     currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
     isPublic: p.isPublic,
-    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : undefined,
+    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : 0,
+    createdAt: p.createdAt,
 });
 
 const serializePost = (p) => ({
     ...serializeSimplePost(p),
     description: p.description,
-    comments: p.comments ? p.comments.map(serializeComment) : undefined,
-    attachments: p.attachments ? p.attachments.map(serializeAttachment) : undefined,
-    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : undefined,
+    comments: p.comments ? p.comments.map(serializeComment) : [],
+    attachments: p.attachments ? p.attachments.map(serializeAttachment) : [],
+    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : [],
 });
 
 const serializeSchedule = (obj) => ({
@@ -66,19 +67,10 @@ const serializeSubject = (obj) => ({
     university: obj.university,
 });
 
-const serializeResources = (p) => ({
-    id: p._id,
-    title: p.title,
-    type: p.type,
-    author: p.author && serializeUser(p.author),
-    description: p.description,
-    comments: p.comments ? p.comments.map(serializeComment) : undefined,
-    attachments: p.attachments ? p.attachments.map(serializeAttachment) : undefined,
-});
 
 const serializeSubjectWithResources = (obj) => ({
     teacherName: obj.teacherName,
-    resources: obj.resources.map(serializeResources),
+    resources: obj.resources.map(serializePost),
 });
 
 const serializeSection = (obj) => ({
