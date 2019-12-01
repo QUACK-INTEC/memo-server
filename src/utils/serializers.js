@@ -70,7 +70,7 @@ const serializeSubject = (obj) => ({
 
 const serializeSubjectWithResources = (obj) => ({
     teacherName: obj.teacherName,
-    resources: obj.resources.map(serializePost),
+    resources: obj.resources.map(serializeSimplePost),
 });
 
 const serializeSection = (obj) => ({
