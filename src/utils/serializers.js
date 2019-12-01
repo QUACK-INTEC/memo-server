@@ -39,16 +39,16 @@ const serializeSimplePost = (p) => ({
     author: p.author && serializeUser(p.author),
     currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
     isPublic: p.isPublic,
-    score: p.reactions.reduce(totalReactions, 0),
+    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : 0,
     createdAt: p.createdAt,
 });
 
 const serializePost = (p) => ({
     ...serializeSimplePost(p),
     description: p.description,
-    comments: p.comments ? p.comments.map(serializeComment) : undefined,
-    attachments: p.attachments ? p.attachments.map(serializeAttachment) : undefined,
-    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : undefined,
+    comments: p.comments ? p.comments.map(serializeComment) : [],
+    attachments: p.attachments ? p.attachments.map(serializeAttachment) : [],
+    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : [],
 });
 
 const serializeSchedule = (obj) => ({
@@ -65,6 +65,12 @@ const serializeSubject = (obj) => ({
     code: obj.code,
     name: obj.name,
     university: obj.university,
+});
+
+
+const serializeSubjectWithResources = (obj) => ({
+    teacherName: obj.teacherName,
+    resources: obj.resources.map(serializeSimplePost),
 });
 
 const serializeSection = (obj) => ({
@@ -102,4 +108,5 @@ module.exports = {
     serializeAttachment,
     serializeTask,
     serializeComment,
+    serializeSubjectWithResources,
 };
