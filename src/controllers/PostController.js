@@ -1,7 +1,7 @@
 
 const SectionService = require('../services/SectionService');
 const PostService = require('../services/PostService');
-const { serializePost } = require('../utils/serializers');
+const { serializePost, serializeTask, serializeComment } = require('../utils/serializers');
 
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
@@ -16,6 +16,7 @@ const create = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
     } = req.body;
     if ((type === 'Event' && !endDate)) {
         throw new MissingFieldError('Fecha de finalización es requerida');
@@ -35,11 +36,12 @@ const create = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
         author: req.user.id,
     });
     res.json({
         success: true,
-        data: post,
+        data: serializePost(post),
     });
 };
 
@@ -53,6 +55,7 @@ const update = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
     } = req.body;
 
     if (type === 'Event' && !(new Date(endDate)).getDate()) {
@@ -60,7 +63,7 @@ const update = async (req, res) => {
     }
 
     const post = await PostService.findById(id);
-    if (String(post.author) !== String(req.user.id)) {
+    if (String(post.author._id) !== String(req.user.id)) {
         throw new ForbiddenError('Este post no le pertenece');
     }
 
@@ -73,17 +76,18 @@ const update = async (req, res) => {
         type,
         section,
         attachments,
+        isPublic,
         author: req.user.id,
     });
     res.json({
         success: true,
-        data: updated,
+        data: serializePost(updated),
     });
 };
 
 const details = async (req, res) => {
     const { id } = req.params;
-    const data = await PostService.findById(id);
+    const data = await PostService.findById(id, req.user.id);
     res.json({
         success: true,
         data: serializePost(data),
@@ -94,7 +98,7 @@ const deletePost = async (req, res) => {
     const { id } = req.params;
 
     const post = await PostService.findById(id);
-    if (String(post.author) !== String(req.user.id)) {
+    if (String(post.author._id) !== String(req.user.id)) {
         throw new ForbiddenError('Este post no le pertenece');
     }
 
@@ -105,9 +109,115 @@ const deletePost = async (req, res) => {
     });
 };
 
+const upVote = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.upVote(id, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const downVote = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.downVote(id, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const resetVote = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.resetVote(id, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const addSubtask = async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+        throw new MissingFieldError('El nombre de la tarea es requerida!');
+    }
+
+    const task = await PostService.addSubtask({
+        name,
+        post: req.params.postId,
+        author: req.user.id,
+    });
+    res.json({
+        success: true,
+        task: serializeTask(task),
+    });
+};
+
+const updateSubtask = async (req, res) => {
+    const { postId, taskId } = req.params;
+    const { isDone } = req.body;
+
+    if (isDone === undefined) {
+        throw new MissingFieldError('Debe especificar si la tarea fue completada o no');
+    }
+
+    const taskData = {
+        _id: taskId,
+        post: postId,
+        author: req.user.id,
+        isDone,
+    };
+
+    const updatedTask = await PostService.updateSubtask(taskData);
+
+    res.json({
+        success: true,
+        task: serializeTask(updatedTask),
+    });
+};
+
+const deleteSubtask = async (req, res) => {
+    const { postId, taskId } = req.params;
+    res.json({
+        success: await PostService.deleteSubtask(taskId, postId, req.user.id),
+    });
+};
+
+const addComment = async (req, res) => {
+    const { body } = req.body;
+
+    if (!body) {
+        throw new MissingFieldError('Debe especificar el mensaje del comentario!');
+    }
+
+    const comment = await PostService.addComment(req.params.postId, req.user.id, body);
+
+    res.json({
+        success: true,
+        comment: serializeComment(comment),
+    });
+};
+
+const deleteComment = async (req, res) => {
+    const { postId, commentId } = req.params;
+
+    res.json({
+        success: await PostService.deleteComment(postId, req.user.id, commentId),
+    });
+};
+
 module.exports = {
     create,
     update,
     details,
     deletePost,
+    addSubtask,
+    updateSubtask,
+    deleteSubtask,
+    upVote,
+    downVote,
+    resetVote,
+    addComment,
+    deleteComment,
 };

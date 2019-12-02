@@ -44,12 +44,19 @@ const findSectionsStudents = async (id) => {
     return res.students;
 };
 
-const findSectionsPosts = async (id) => {
+const findSectionsPosts = async (id, currentUserId) => {
     const posts = await PostModel
-        .find({ section: id })
-        .lean().exec();
-
-
+        .find({
+            section: id,
+            $or: [
+                { isPublic: true },
+                { isPublic: false, author: currentUserId },
+            ],
+        })
+        .populate('author')
+        .populate({ path: 'reactions.author', model: 'user' })
+        .lean()
+        .exec();
     return posts;
 };
 

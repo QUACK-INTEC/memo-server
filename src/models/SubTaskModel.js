@@ -12,11 +12,17 @@ const SubTaskModel = new Schema({
     isDone: {
         type: Boolean,
         required: true,
+        default: false,
     },
     author: {
         type: ObjectId,
         required: true,
         ref: 'user',
+    },
+    post: {
+        type: ObjectId,
+        required: true,
+        ref: 'post',
     },
 }, { timestamps: true });
 

@@ -1,2 +1,2 @@
 require('./src/database');
-module.exports = require('./src/server').default;
+module.exports = require('./src/server');

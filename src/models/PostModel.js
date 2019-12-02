@@ -1,10 +1,8 @@
 const mongoose = require('mongoose');
 const ReactionModel = require('./ReactionModel');
 const CommentModel = require('./CommentModel');
-const AttachmentModel = require('./AttachmentModel');
 
 const { Schema } = mongoose;
-
 
 const { Date, String, ObjectId } = Schema.Types;
 
@@ -26,6 +24,11 @@ const PostModel = new Schema({
     type: {
         type: String,
         enum: ['Event', 'Resource'],
+        required: true,
+    },
+    isPublic: {
+        type: Boolean,
+        default: true,
         required: true,
     },
     author: {
@@ -52,5 +55,11 @@ const PostModel = new Schema({
         ref: 'section',
     },
 }, { timestamps: true });
+
+PostModel.virtual('subtasks', {
+    ref: 'subTask',
+    localField: '_id',
+    foreignField: 'post',
+});
 
 module.exports = mongoose.model('post', PostModel);
