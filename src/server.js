@@ -27,11 +27,10 @@ app.use('/v1', require('./routes'));
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-    winston.error(err.stack);
-
     if (err instanceof MemoError) {
         res.status(err.statusCode).json({ code: err.internalCode, msg: err.message });
     } else {
+        winston.error(err.stack);
         res.status(500).json({ success: false, msg: 'Something broke!' });
     }
 });
