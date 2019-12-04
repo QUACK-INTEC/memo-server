@@ -7,16 +7,10 @@ const {
     UserModel,
 } = require('../src/models');
 
-const InternalErrors = require('../src/constants/errors/InternalErrors');
-
-const should = chai.should();
+chai.should();
 chai.use(chaiHttp);
 
 describe('Authentication', () => {
-    before(async () => {
-
-    });
-
     describe('EP1 Regiter user (POST /v1/auth/register)', () => {
         const userData = {
             firstName: 'Prueba',
@@ -40,7 +34,7 @@ describe('Authentication', () => {
             const res = await chai.request(server).post('/v1/auth/register').send(userData);
             res.should.have.status(400);
         });
-        it('should fail with code 400 creating an user with error missing files', async () => {
+        it('should fail with code 400 creating an user with error missing fields', async () => {
             const res = await chai.request(server).post('/v1/auth/register').send({});
             res.should.have.status(400);
         });
@@ -62,9 +56,8 @@ describe('Authentication', () => {
             token.should.not.eql(false);
             res.body.success.should.eql(true);
             res.body.user.email.should.eql(user.email);
-            res.body.user.email.should.eql(user.email);
         });
-        it('should login user in correctly', async () => {
+        it('should fail when wrong password sent', async () => {
             const user = {
                 email: 'prueba@prueba.com',
                 password: 'fail',
@@ -73,7 +66,16 @@ describe('Authentication', () => {
 
             res.should.have.status(401);
         });
-        it('should login user in correctly with missing fields', async () => {
+        it('should fail when wrong password sent', async () => {
+            const user = {
+                email: 'prueba2@prueba.com',
+                password: 'fail',
+            };
+            const res = await chai.request(server).post('/v1/auth/login').send(user);
+
+            res.should.have.status(401);
+        });
+        it('should fail with missing fields', async () => {
             const user = {
                 email: 'prueba@prueba.com',
             };
@@ -84,8 +86,7 @@ describe('Authentication', () => {
         });
     });
 
-
-    describe('EP4 User previously authenticated (POST /v1/auth/check)', () => {
+    describe('EP4 Auth Check (POST /v1/auth/check)', () => {
         let token = false;
 
         it('should check token correctly', async () => {
