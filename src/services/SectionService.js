@@ -5,7 +5,7 @@ const findMySections = async (userId) => {
     const id = new mongoose.Types.ObjectId(userId);
 
     const result = await SectionModel
-        .find({ students: id })
+        .find({ students: id, active: true })
         .populate('students', 'firstName lastName email points')
         .populate('subject', 'name code university')
         .lean()
@@ -14,6 +14,7 @@ const findMySections = async (userId) => {
 };
 
 const getCommonSections = async (firstUserId, secondUserId) => SectionModel.find({
+    active: true,
     students: { $all: [firstUserId, secondUserId] },
 });
 
