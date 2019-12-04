@@ -163,6 +163,70 @@ describe('Sections', () => {
         });
     });
 
+    describe('EP7 Section Info (GET /v1/sections/:id)', () => {
+        it('should get section', async () => {
+            const subject = await new SubjectModel({
+                name: 'Clase de Prueba',
+                code: '101',
+                university: university._id,
+            }).save();
+
+            const sectionData = {
+                subject: subject._id,
+                professorName: 'Profesor Prueba',
+                classRoom: 'VT',
+                active: true,
+                code: '101',
+                students: [userId],
+                schedule: {},
+                discriminator: 'TEST_TRIMESTER',
+            };
+
+            const section = await new SectionModel(sectionData).save();
+
+            const sectionId = section._id.toString();
+
+            const res = await chai.request(server)
+                .get(`/v1/sections/${sectionId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+            res.body.data.should.be.an('object').with.keys('id', 'professorName', 'schedule', 'classRoom', 'active', 'code', 'subject');
+
+            res.body.data.id.should.eql(sectionId);
+            res.body.data.professorName.should.eql(sectionData.professorName);
+            res.body.data.code.should.eql(sectionData.code);
+            res.body.data.classRoom.should.eql(sectionData.classRoom);
+            res.body.data.schedule.should.eql({});
+
+            res.body.data.subject.should.be.an('object');
+            res.body.data.subject.id.should.eql(subject._id.toString());
+
+            // Cleanup classes
+            await SubjectModel.deleteMany({});
+            await SectionModel.deleteMany({});
+        });
+
+        it('should fail when unauthorized', async () => {
+            const res = await chai.request(server)
+                .get('/v1/sections/5dde198fb48188501ae61353')
+                .send();
+
+            res.should.have.status(401);
+        });
+
+        it('should fail with nonexistent section', async () => {
+            const res = await chai.request(server)
+                .get('/v1/sections/5dde198fb48188501ae61353')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(404);
+        });
+    });
+
     after(async () => {
         // Clear created docs
         await UserModel.deleteMany({});

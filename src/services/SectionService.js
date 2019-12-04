@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { SectionModel, PostModel } = require('../models');
 
+const NotFoundError = require('../constants/errors/NotFoundError');
+
 const findMySections = async (userId) => {
     const id = new mongoose.Types.ObjectId(userId);
 
@@ -23,6 +25,11 @@ const findById = async (id) => {
         .findById(id)
         .populate('subject', 'name code university')
         .lean().exec();
+
+    if (result == null) {
+        throw new NotFoundError('Seccion no encontrada');
+    }
+
     return result;
 };
 

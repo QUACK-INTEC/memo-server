@@ -12,8 +12,6 @@ const {
     PostModel,
 } = require('../src/models');
 
-const InternalErrors = require('../src/constants/errors/InternalErrors');
-
 const should = chai.should();
 chai.use(chaiHttp);
 
