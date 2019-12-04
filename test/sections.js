@@ -228,7 +228,7 @@ describe('Sections', () => {
         });
     });
 
-    describe('EP8 Seciton Posts (GET /v1/sections/:id/posts)', () => {
+    describe('EP8 Section Posts (GET /v1/sections/:id/posts)', () => {
         let sectionId = false;
 
         before(async () => {
@@ -323,7 +323,7 @@ describe('Sections', () => {
         });
     });
 
-    describe('EP8 Seciton Posts (GET /v1/sections/:id/posts)', () => {
+    describe('EP9 Section Students (GET /v1/sections/:id/students)', () => {
         let subjectId;
 
         before(async () => {
