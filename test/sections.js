@@ -8,6 +8,7 @@ const {
     SubjectModel,
     SectionModel,
     UserModel,
+    PostModel,
 } = require('../src/models');
 
 chai.should();
@@ -224,6 +225,192 @@ describe('Sections', () => {
                 .send();
 
             res.should.have.status(404);
+        });
+    });
+
+    describe('EP8 Seciton Posts (GET /v1/sections/:id/posts)', () => {
+        let sectionId = false;
+
+        before(async () => {
+            const subject = await new SubjectModel({
+                name: 'Clase de Prueba',
+                code: '101',
+                university: university._id,
+            }).save();
+
+            const section = await new SectionModel({
+                subject: subject._id,
+                professorName: 'Profesor Prueba',
+                classRoom: 'VT',
+                active: true,
+                code: '101',
+                students: [userId],
+                schedule: {},
+                discriminator: 'TEST_TRIMESTER',
+            }).save();
+
+            sectionId = section._id.toString();
+        });
+
+        it('should return section posts', async () => {
+            const postData = {
+                section: sectionId,
+                title: 'Publicación de prueba',
+                description: 'Descripción de la publicación',
+                type: 'Event',
+                startDate: new Date(),
+                endDate: new Date(),
+                isPublic: false,
+            };
+
+            const createRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(postData);
+
+            createRes.should.have.status(200);
+
+            const res = await chai.request(server)
+                .get(`/v1/sections/${sectionId}/posts`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.data.should.be.an('array').with.lengthOf(1);
+
+            const postInfo = res.body.data[0];
+            postInfo.should.be.an('object');
+            postInfo.id.should.eql(createRes.body.data.id);
+            postInfo.title.should.eql(postData.title);
+            postInfo.type.should.eql(postData.type);
+            postInfo.author.should.be.an('object');
+            postInfo.isPublic.should.eql(postData.isPublic);
+
+            // Cleanup
+            await PostModel.deleteMany({});
+        });
+
+        it('should not return any posts', async () => {
+            const res = await chai.request(server)
+                .get(`/v1/sections/${sectionId}/posts`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.data.should.be.an('array').with.lengthOf(0);
+        });
+
+        it('should fail when section does not exist', async () => {
+            const res = await chai.request(server)
+                .get('/v1/sections/5dde198fb48188501ae61353/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(404);
+        });
+
+        it('should fail when not logged in', async () => {
+            const res = await chai.request(server)
+                .get('/v1/sections/5dde198fb48188501ae61353/posts')
+                .send();
+
+            res.should.have.status(401);
+        });
+
+        after(async () => {
+            await SubjectModel.deleteMany({});
+            await SectionModel.deleteMany({});
+        });
+    });
+
+    describe('EP8 Seciton Posts (GET /v1/sections/:id/posts)', () => {
+        let subjectId;
+
+        before(async () => {
+            const subject = await new SubjectModel({
+                name: 'Clase de Prueba',
+                code: '101',
+                university: university._id,
+            }).save();
+
+            subjectId = subject._id.toString();
+        });
+
+        it('should return section participants', async () => {
+            const section = await new SectionModel({
+                subject: subjectId,
+                professorName: 'Profesor Prueba',
+                classRoom: 'VT',
+                active: true,
+                code: '101',
+                students: [userId],
+                schedule: {},
+                discriminator: 'TEST_TRIMESTER',
+            }).save();
+
+            const sectionId = section._id.toString();
+
+            const res = await chai.request(server)
+                .get(`/v1/sections/${sectionId}/students`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.data.should.be.an('array').with.lengthOf(1);
+
+            const userInfo = res.body.data[0];
+            userInfo.should.be.an('object');
+            userInfo.id.should.eql(userId);
+
+            // Cleanup
+            await SectionModel.deleteMany({});
+        });
+
+        it('should not return any participants', async () => {
+            const section = await new SectionModel({
+                subject: subjectId,
+                professorName: 'Profesor Prueba',
+                classRoom: 'VT',
+                active: true,
+                code: '101',
+                students: [],
+                schedule: {},
+                discriminator: 'TEST_TRIMESTER',
+            }).save();
+
+            const sectionId = section._id.toString();
+
+            const res = await chai.request(server)
+                .get(`/v1/sections/${sectionId}/students`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.data.should.be.an('array').with.lengthOf(0);
+
+            // Cleanup
+            await SectionModel.deleteMany({});
+        });
+
+        it('should fail when section does not exist', async () => {
+            const res = await chai.request(server)
+                .get('/v1/sections/5dde198fb48188501ae61353/students')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(404);
+        });
+
+        it('should fail when not logged in', async () => {
+            const res = await chai.request(server)
+                .get('/v1/sections/5dde198fb48188501ae61353/students')
+                .send();
+
+            res.should.have.status(401);
+        });
+
+        after(async () => {
+            await SubjectModel.deleteMany({});
         });
     });
 

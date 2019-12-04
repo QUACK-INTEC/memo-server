@@ -49,10 +49,21 @@ const findSectionsStudents = async (id) => {
         .populate('subject', 'name code university')
         .lean()
         .exec();
+
+    if (res == null) {
+        throw new NotFoundError('Seccion no encontrada');
+    }
+
     return res.students;
 };
 
 const findSectionsPosts = async (id, currentUserId) => {
+    const section = await SectionModel.findById(id).lean().exec();
+
+    if (section == null) {
+        throw new NotFoundError('Seccion no encontrada');
+    }
+
     const posts = await PostModel
         .find({
             section: id,
