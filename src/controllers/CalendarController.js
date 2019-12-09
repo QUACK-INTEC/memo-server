@@ -4,7 +4,7 @@ const { serializeSimplePost, serializeSection } = require('../utils/serializers'
 
 const getEventsByDate = async (req, res) => {
     const { date } = req.params;
-    const { section, isPublic } = req.body;
+    const { section, isPublic } = req.query;
     const events = await CalendarService.findEventsByDate(date, req.user.id, section, isPublic);
     const classes = await CalendarService.findSectionsForToday(date, req.user.id);
     res.json({

@@ -1,6 +1,6 @@
 const convertWeekNumberToLetter = (day) => {
     const days = [
-        'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+        'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
     ];
     return days[day];
 };

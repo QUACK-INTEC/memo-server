@@ -4,30 +4,27 @@ const { convertWeekNumberToLetter, extractDateFromYYYYMMDD } = require('../utils
 
 const findEventsByDate = async (dateString, currentUserId, section, isPublic) => {
     const date = extractDateFromYYYYMMDD(dateString);
-    const start = new Date(new Date(date).setHours(0, 0, 0, 0)).toUTCString();
-    const end = new Date(new Date(date).setHours(23, 59, 59, 999)).toUTCString();
-
+    const start = new Date(new Date(date).setHours(0, 0, 0, 0));
+    const end = new Date(new Date(date).setHours(23, 59, 59, 999));
 
     let or = [
         { isPublic: true },
         { isPublic: false, author: currentUserId },
     ];
-    if (isPublic !== null && isPublic !== undefined) {
-        if (isPublic) {
-            or = [{ isPublic: true }];
-        } else {
-            or = [{ isPublic: false, author: currentUserId }];
-        }
+    if (String(isPublic) === 'true') {
+        or = [{ isPublic: true }];
+    } else if (String(isPublic) === 'false') {
+        or = [{ isPublic: false, author: currentUserId }];
     }
-    console.log(or);
 
+    const query = {
+        type: 'Event',
+        endDate: { $gte: start, $lte: end },
+        $or: or,
+    };
+    if (section) query.section = section;
     const posts = await PostModel
-        .find({
-            section,
-            endDate: { $gte: start, $lte: end },
-            type: 'Event',
-            $or: or,
-        })
+        .find(query)
         .lean()
         .exec();
     return posts;
