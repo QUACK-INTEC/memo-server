@@ -6,6 +6,10 @@ const { serializeAttachment, serializeUser } = require('../utils/serializers');
 const MissingFieldError = require('../constants/errors/MissingFieldError');
 
 const uploadAttachments = async (req, res) => {
+    if (!req.files) {
+        throw new MissingFieldError('Debe especificar al menos un archivo a subir!');
+    }
+
     const customNames = Array.isArray(req.body.names) ? req.body.names : [req.body.names];
     const useCustomNames = customNames && req.files.length === customNames.length;
 

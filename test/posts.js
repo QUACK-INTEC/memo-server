@@ -12,8 +12,6 @@ const {
     PostModel,
 } = require('../src/models');
 
-const InternalErrors = require('../src/constants/errors/InternalErrors');
-
 const should = chai.should();
 chai.use(chaiHttp);
 
@@ -140,7 +138,6 @@ describe('Posts', () => {
 
 
             res.should.have.status(400);
-            res.body.code.should.eql(InternalErrors.missingFields);
         });
     });
 
@@ -181,6 +178,10 @@ describe('Posts', () => {
                 .put('/v1/posts/5dde198fb48188501ae61353')
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
+                    section: sectionId,
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
                     title: 'Publicación Actualizada',
                 });
 
