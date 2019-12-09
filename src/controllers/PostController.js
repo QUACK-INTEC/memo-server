@@ -18,6 +18,11 @@ const create = async (req, res) => {
         attachments,
         isPublic,
     } = req.body;
+
+    if (!title || !description || !type || isPublic === undefined || !section) {
+        throw new MissingFieldError('Campos faltantes');
+    }
+
     if ((type === 'Event' && !endDate)) {
         throw new MissingFieldError('Fecha de finalización es requerida');
     }
@@ -57,6 +62,10 @@ const update = async (req, res) => {
         attachments,
         isPublic,
     } = req.body;
+
+    if (!title || !description || !type || isPublic === undefined || !section) {
+        throw new MissingFieldError('Campos faltantes');
+    }
 
     if (type === 'Event' && !(new Date(endDate)).getDate()) {
         throw new InvalidFieldError('Fecha de finalización no es válida');
