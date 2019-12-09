@@ -83,14 +83,6 @@ const serializeSection = (obj) => ({
     subject: serializeSubject(obj.subject),
 });
 
-const serializeSectionStudent = (s) => ({
-    id: s._id,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    email: s.email,
-    points: s.points,
-});
-
 const serializeUniversity = (uni) => ({
     id: uni._id,
     title: uni.title,
@@ -101,7 +93,6 @@ const serializeUniversity = (uni) => ({
 module.exports = {
     serializeUser,
     serializeSection,
-    serializeSectionStudent,
     serializeUniversity,
     serializeSimplePost,
     serializePost,
