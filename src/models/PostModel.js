@@ -44,11 +44,11 @@ const PostModel = new Schema({
         type: [CommentModel.schema],
         require: false,
     },
-    attachments: [{
-        type: ObjectId,
+    attachments: {
+        type: [ObjectId],
         required: false,
         ref: 'attachment',
-    }],
+    },
     section: {
         type: ObjectId,
         required: true,
