@@ -51,7 +51,7 @@ describe('File Uploads', () => {
             res.should.have.status(200);
             res.body.success.should.eql(true);
             res.body.attachments.should.be.an('array').with.lengthOf(1);
-            res.body.attachments[0].should.be.an('object').with.all.keys('id', 'fileURL', 'name');
+            res.body.attachments[0].should.be.an('object').with.all.keys('id', 'fileURL', 'name', 'uploadedBy');
             res.body.attachments[0].name.should.eql('ImagenPrueba');
 
             // REMOVE FROM S3 (CLEANUP)
