@@ -9,5 +9,6 @@ router.use('/subjects', require('./subjects'));
 router.use('/sync', require('./sync'));
 router.use('/profile', require('./profile'));
 router.use('/upload', require('./upload'));
+router.use('/notifications', require('./notifications'));
 
 module.exports = router;
