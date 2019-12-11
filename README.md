@@ -2,8 +2,6 @@
 
 Servidor en express para la Aplicacion movil creada para  [Proyecto Final, Grupo QUACK](https://www.intec.edu.do) alojado en heroku.
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/QUACK-INTEC/memo-server)
-
 
 ## Tabla de contenidos
 
@@ -17,13 +15,12 @@ Servidor en express para la Aplicacion movil creada para  [Proyecto Final, Grupo
 # Instrucciones de configuración
 
 ## Prerrequisitos
-- [Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+- [NodeJS](https://nodejs.org)
 - [Express](https://expressjs.com/es/)
-- [Axios](https://github.com/axios/axios)
 - [Heroku](https://www.heroku.com/)
 - [Mongodb](https://www.mongodb.com/es)
-- [Yarn Package Manager](https://yarnpkg.com/en/)
-- [Node version Manager](https://github.com/creationix/nvm)
+
+Ver versiones especificas en package.json.
 
 ## Instrucciones
 
@@ -33,7 +30,7 @@ Servidor en express para la Aplicacion movil creada para  [Proyecto Final, Grupo
 $ git clone
 ```
 
-2. Correr el comando **yarn install** dentro del directorio del proyecto para instalar todas las dependencias.
+2. Correr el comando **npm install** dentro del directorio del proyecto para instalar todas las dependencias.
 
 ```sh
 $ npm install
@@ -41,7 +38,30 @@ $ npm install
 
 # Instrucciones de instalación
 
-## Heroku?
+## Variables de ambiente
+
+Para ciertas funcionalidades, la aplicacion depende de que algunas variables de ambiente estén configuradas:
+
+**Carga de archivos**
+- `AWS_ACCESS_KEY_ID`: Identificador de acceso del proveedor de object storage.
+- `AWS_SECRET_ACCESS_KEY`: Llave de acceso secreta del proveedor de object storage.
+
+**Autenticación**
+- `AUTH_SECRET`: Llave secreta de encriptación de credenciales de usuario. Esta tendrá un valor por defecto que debe ser especificado en ambientes productivos.
+
+**Base de datos**
+- `MONGODB_URI`: URI de conexión hacia la base de datos mongodb. Por defecto apunta a una instalación local. 
+
+## Despliegue
+
+### Heroku
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/QUACK-INTEC/memo-server)
+
+Para desplegar la aplicacion en un servidor de Heroku, solo debe presionar botón anterior. El URI de conexion a la base de datos se configurará automaticamente. 
+
+### Servidores tradicionales
+
+Para desplegar en servidores tradicionales, asegurar instalar NodeJS en el servidor, asi como tener MongoDB corriendo, sea en el mismo servidor o en algun proveedor de base de datos como servicio (MongoDB Atlas)
 
 # Instrucciones de operación
 
@@ -58,8 +78,13 @@ $ npm start
 
 2. Colocar los parametros necesarios (si aplica) para poder realizar la llamada al endpoint que queremos probar.
 
+## Pruebas unitarias
 
+Para correr las pruebas unitarias, asegurar tener instalado `mocha`. Luego, correr siguiente comando:
 
+```sh
+$ npm run test 
+```
 
 # Estructura de archivos y directorios
 
