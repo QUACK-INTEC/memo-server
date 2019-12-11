@@ -11,6 +11,7 @@ const serializeAttachment = (att) => ({
     id: att._id,
     fileURL: att.fileURL,
     name: att.name,
+    uploadedBy: att.uploadedBy && serializeUser(att.uploadedBy),
 });
 
 const serializeTask = (task) => ({
@@ -70,7 +71,7 @@ const serializeSubject = (obj) => ({
 
 const serializeSubjectWithResources = (obj) => ({
     teacherName: obj.teacherName,
-    resources: obj.resources.map(serializeSimplePost),
+    resources: obj.resources.map(serializeAttachment),
 });
 
 const serializeSection = (obj) => ({
