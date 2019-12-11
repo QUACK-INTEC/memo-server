@@ -52,6 +52,9 @@ Para ciertas funcionalidades, la aplicacion depende de que algunas variables de 
 - `AWS_ACCESS_KEY_ID`: Identificador de acceso del proveedor de object storage.
 - `AWS_SECRET_ACCESS_KEY`: Llave de acceso secreta del proveedor de object storage.
 
+**Otros**
+- `PORT`: Puerto donde desea correr la aplicacion. Por defecto, `3000`.
+
 ## Despliegue
 
 ### Heroku
