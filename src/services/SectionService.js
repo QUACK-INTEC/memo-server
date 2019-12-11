@@ -45,7 +45,7 @@ const updateOrCreate = async (sectionData) => {
 const findSectionsStudents = async (id) => {
     const res = await SectionModel
         .findById(id)
-        .populate('students', 'firstName lastName email points')
+        .populate('students', 'firstName lastName email points avatarURL')
         .populate('subject', 'name code university')
         .lean()
         .exec();
