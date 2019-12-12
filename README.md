@@ -14,6 +14,23 @@ Servidor en express para la Aplicacion movil creada para  [Proyecto Final, Grupo
 
 # Instrucciones de configuración
 
+## Variables de ambiente
+
+Para ciertas funcionalidades, la aplicacion depende de que algunas variables de ambiente estén configuradas:
+
+**Base de datos**
+- `MONGODB_URI`: URI de conexión hacia la base de datos mongodb. Por defecto apunta a una instalación local. 
+
+**Autenticación**
+- `AUTH_SECRET`: Llave secreta de encriptación de credenciales de usuario. Esta tendrá un valor por defecto que debe ser especificado en ambientes productivos.
+
+**Carga de archivos**
+- `AWS_ACCESS_KEY_ID`: Identificador de acceso del proveedor de object storage.
+- `AWS_SECRET_ACCESS_KEY`: Llave de acceso secreta del proveedor de object storage.
+
+**Otros**
+- `PORT`: Puerto donde desea correr la aplicacion. Por defecto, `3000`.
+
 ## Prerrequisitos
 - [NodeJS](https://nodejs.org)
 - [Express](https://expressjs.com/es/)
@@ -37,23 +54,6 @@ $ npm install
 ```
 
 # Instrucciones de instalación
-
-## Variables de ambiente
-
-Para ciertas funcionalidades, la aplicacion depende de que algunas variables de ambiente estén configuradas:
-
-**Base de datos**
-- `MONGODB_URI`: URI de conexión hacia la base de datos mongodb. Por defecto apunta a una instalación local. 
-
-**Autenticación**
-- `AUTH_SECRET`: Llave secreta de encriptación de credenciales de usuario. Esta tendrá un valor por defecto que debe ser especificado en ambientes productivos.
-
-**Carga de archivos**
-- `AWS_ACCESS_KEY_ID`: Identificador de acceso del proveedor de object storage.
-- `AWS_SECRET_ACCESS_KEY`: Llave de acceso secreta del proveedor de object storage.
-
-**Otros**
-- `PORT`: Puerto donde desea correr la aplicacion. Por defecto, `3000`.
 
 ## Despliegue
 
