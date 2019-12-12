@@ -83,6 +83,47 @@ const changeVote = async (id, userId, value) => {
 const upVote = async (id, userId) => changeVote(id, userId, 1);
 const downVote = async (id, userId) => changeVote(id, userId, -1);
 
+const resetVoteComment = async (id, userId) => {
+    const post = await PostModel.findOne(
+        {
+            'comments._id': id,
+        },
+    )
+        .exec();
+    const comment = post.comments.id(id);
+    const reactions = [];
+    comment.reactions.forEach((r) => {
+        if (String(r.author) !== String(userId)) {
+            reactions.push(r);
+        }
+    });
+
+    const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
+        $set:
+        { 'comments.$.reactions': reactions },
+    }, { upsert: true });
+    return result;
+};
+
+
+const changeVoteComment = async (id, userId, value) => {
+    await resetVoteComment(id, userId);
+    const reaction = {
+        author: userId,
+        value,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+    };
+    const result = await PostModel.update({ 'comments._id': id }, {
+        $push:
+        { 'comments.$.reactions': reaction },
+    });
+    return result;
+};
+
+const upVoteComment = async (id, userId) => changeVoteComment(id, userId, 1);
+const downVoteComment = async (id, userId) => changeVoteComment(id, userId, -1);
+
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
 
 const addSubtask = async (data) => new SubTaskModel(data).save();
@@ -174,6 +215,9 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    upVoteComment,
+    downVoteComment,
+    resetVoteComment,
     addComment,
     deleteComment,
 };
