@@ -39,6 +39,7 @@ const UserModel = new Schema({
         required: false,
         ref: 'section',
     }],
+    expoPushToken: String,
 }, {
     timestamps: true,
 });
