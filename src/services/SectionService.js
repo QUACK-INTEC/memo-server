@@ -18,7 +18,7 @@ const findMySections = async (userId) => {
 const getCommonSections = async (firstUserId, secondUserId) => SectionModel.find({
     active: true,
     students: { $all: [firstUserId, secondUserId] },
-});
+}).populate('subject', 'name code university');
 
 const findById = async (id) => {
     const result = await SectionModel
