@@ -14,8 +14,8 @@ describe('UniHook - INTEC', () => {
             classes[0].should.have.property('code', 'IDS322');
             classes[0].should.have.property('section', '01');
             classes[0].should.have.property('room', 'VT1');
-            classes[0].should.have.property('name', 'MANTENIMIENTO DE SOFTWARE');
-            classes[0].should.have.property('professor', 'FRANCIA ODALIS MEJIA POLANCO');
+            classes[0].should.have.property('name', 'Mantenimiento de Software');
+            classes[0].should.have.property('professor', 'Francia Odalis Mejia Polanco');
             classes[0].should.have.property('schedule');
 
             classes[0].schedule.should.be.an('object').and.include.all.keys('monday', 'wednesday');
@@ -26,7 +26,7 @@ describe('UniHook - INTEC', () => {
 
         it('should strip extra spaces from professor name', () => {
             const classes = parseSchedule(RES_EXAMPLE_SCHEDULE);
-            classes[2].should.have.property('professor', 'DAVID ALEJANDRO JOA MORALES');
+            classes[2].should.have.property('professor', 'David Alejandro Joa Morales');
         });
     });
 

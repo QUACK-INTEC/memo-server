@@ -25,7 +25,7 @@ const sync = async (req, res) => {
 
     const { schedule, discriminator } = uniData;
     const sectionsPromises = schedule.map(async (sectionData) => {
-        const subject = await SubjectService.findOrCreate(
+        const subject = await SubjectService.updateOrCreate(
             universityModel._id,
             sectionData.code,
             sectionData.name,
