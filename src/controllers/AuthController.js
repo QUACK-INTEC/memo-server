@@ -83,6 +83,28 @@ const forgotPassword = async (req, res) => {
     res.json({ success });
 };
 
+const resetPassword = async (req, res) => {
+    const {
+        password,
+    } = req.body;
+    const { email } = req.user;
+
+    if (!password) {
+        throw new MissingFieldError('Faltan campos requeridos');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const userInfo = {
+        email: email.toLowerCase(),
+        password: hashedPassword,
+    };
+
+    const user = await UserService.changePassword(userInfo);
+    return res.status(200).json({ user: serializeUser(user) });
+};
+
 
 module.exports = {
     register,
@@ -90,4 +112,5 @@ module.exports = {
     refreshToken,
     checkAuth,
     forgotPassword,
+    resetPassword,
 };

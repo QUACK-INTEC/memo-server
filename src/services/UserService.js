@@ -58,10 +58,15 @@ const sendForgotPasswordEmail = async (email) => {
     return success;
 };
 
+const changePassword = async (userData) => UserModel.findOneAndUpdate(
+    { email: userData.email }, { password: userData.password },
+).lean().exec();
+
 module.exports = {
     create,
     findById,
     findOne,
     updateAvatar,
     sendForgotPasswordEmail,
+    changePassword,
 };
