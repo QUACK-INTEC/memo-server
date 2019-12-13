@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 const { UserModel } = require('../models');
 
 const memoEmail = 'memostudentapp@gmail.com';
@@ -42,12 +43,21 @@ const sendForgotPasswordEmail = async (email) => {
         },
     });
 
+    const tempCode = Math.random().toString(36).substring(6);
+
+    const salt = await bcrypt.genSalt(10);
+    const tempPass = await bcrypt.hash(tempCode, salt);
+
+    const otpExpiration = (new Date()).setDate((new Date()).getDate() + 1);
+
+    const res = await UserModel.updateOne({ email }, { otp: tempPass, otpExpiration });
     const mailOptions = {
         from: memoEmail,
         to: email,
         subject: 'Memo: Recover your password',
-        text: 'Follow the following link to recover your password:',
+        text: `Your 24 hours valid and one time password is: ${tempCode}`,
     };
+
 
     let success = true;
     transporter.sendMail(mailOptions, (error) => {

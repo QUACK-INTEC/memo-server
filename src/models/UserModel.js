@@ -24,6 +24,14 @@ const UserModel = new Schema({
         type: String,
         required: true,
     },
+    otp: {
+        type: String,
+        required: false,
+    },
+    otpExpiration: {
+        type: Date,
+        required: false,
+    },
     avatarURL: {
         type: String,
     },
