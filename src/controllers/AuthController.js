@@ -77,9 +77,17 @@ const checkAuth = (req, res) => {
     res.json({ user: req.user });
 };
 
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    const success = await UserService.sendForgotPasswordEmail(email);
+    res.json({ success });
+};
+
+
 module.exports = {
     register,
     login,
     refreshToken,
     checkAuth,
+    forgotPassword,
 };
