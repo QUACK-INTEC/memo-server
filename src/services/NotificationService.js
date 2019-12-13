@@ -28,12 +28,16 @@ const sendNewPostNotification = async (newPost) => {
         return tokens;
     }, []);
 
+    if (recipients.length === 0) {
+        return;
+    }
+
     try {
         await expo.sendPushNotificationsAsync([{
             to: recipients,
             sound: 'default',
-            title: `Nueva publicación en ${section.subject.code}`,
-            body: newPost.title,
+            title: 'Nueva publicación creada',
+            body: `${section.subject.name}: ${newPost.title}`,
             data: {
                 postId: newPost._id,
             },
