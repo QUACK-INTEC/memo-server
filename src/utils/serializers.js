@@ -11,6 +11,7 @@ const serializeAttachment = (att) => ({
     id: att._id,
     fileURL: att.fileURL,
     name: att.name,
+    uploadedBy: att.uploadedBy && serializeUser(att.uploadedBy),
 });
 
 const serializeTask = (task) => ({
@@ -70,7 +71,7 @@ const serializeSubject = (obj) => ({
 
 const serializeSubjectWithResources = (obj) => ({
     teacherName: obj.teacherName,
-    resources: obj.resources.map(serializeSimplePost),
+    resources: obj.resources.map(serializeAttachment),
 });
 
 const serializeSection = (obj) => ({
@@ -83,14 +84,6 @@ const serializeSection = (obj) => ({
     subject: serializeSubject(obj.subject),
 });
 
-const serializeSectionStudent = (s) => ({
-    id: s._id,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    email: s.email,
-    points: s.points,
-});
-
 const serializeUniversity = (uni) => ({
     id: uni._id,
     title: uni.title,
@@ -101,7 +94,6 @@ const serializeUniversity = (uni) => ({
 module.exports = {
     serializeUser,
     serializeSection,
-    serializeSectionStudent,
     serializeUniversity,
     serializeSimplePost,
     serializePost,

@@ -25,11 +25,22 @@ const getPermanentResources = async (subjectId) => {
     })
         .populate('section')
         .populate('author')
-        .populate('attachments')
+        .populate({
+            path: 'attachments',
+            model: 'attachment',
+            populate: {
+                path: 'uploadedBy',
+                model: 'user',
+            },
+        })
         .lean()
         .exec();
-
-    posts.forEach((p) => teachersMap[p.section.professorName].push(p));
+    posts.forEach((p) => {
+        teachersMap[p.section.professorName] = [
+            ...teachersMap[p.section.professorName],
+            ...p.attachments,
+        ];
+    });
 
     const result = Object.keys(teachersMap).map((teacher) => ({ teacherName: teacher, resources: teachersMap[teacher] }));
     return result;

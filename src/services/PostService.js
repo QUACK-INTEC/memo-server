@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { PostModel, SubTaskModel } = require('../models');
+const NotificationService = require('./NotificationService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 
@@ -31,6 +32,11 @@ const findById = async (id, userId) => {
 
 const create = async (data) => {
     const result = await new PostModel(data).save();
+
+    if (result.isPublic) {
+        await NotificationService.sendNewPostNotification(result);
+    }
+
     return result;
 };
 
