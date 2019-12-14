@@ -10,7 +10,10 @@ const getEventsByDate = async (req, res) => {
     res.json({
         success: true,
         events: events.map(serializeSimplePost),
-        classes: classes.map(serializeSection),
+        classes: classes.map((c) => ({
+            ...serializeSection(c),
+            schedule: c.schedule,
+        })),
     });
 };
 

@@ -35,15 +35,30 @@ const findSectionsForToday = async (dateString, currentUserId) => {
     const date = extractDateFromYYYYMMDD(dateString);
     const day = convertWeekNumberToLetter(date.getDay());
 
-    const result = await SectionModel
-        .find({ students: userId })
+    const sections = await SectionModel
+        .find({ active: true, students: userId })
         .find({
             [`schedule.${day}`]: { $exists: true, $ne: null },
         })
         .populate('subject', 'name code university')
         .lean()
         .exec();
+    const result = sections.map((s) => {
+        const { from } = s.schedule[day];
+        const { to } = s.schedule[day];
 
+        const startHours = (new Date(date)).setHours(from, 0, 0, 0);
+        const endHours = (new Date(date)).setHours(to, 0, 0, 0);
+        const schedule = {
+            from: startHours,
+            to: endHours,
+        };
+
+        return {
+            ...s,
+            schedule,
+        };
+    });
     return result;
 };
 
