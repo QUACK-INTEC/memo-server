@@ -65,6 +65,32 @@ const login = async (req, res) => {
     }
 };
 
+const otp = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        throw new MissingFieldError('Faltan campos requeridos');
+    }
+
+    const user = await UserService.findOne({ email });
+    if (!user) {
+        throw new UnauthorizedError('Usuario no encontrado');
+    }
+
+    const isLate = (new Date(user.otpExpiration)) < Date.now();
+    const isMatch = await bcrypt.compare(password, user.otp || '');
+    if (isMatch && !isLate) {
+        await UserService.resetOtp(email);
+        res.json({
+            success: true,
+            token: genToken(user._id, user.email),
+            user: serializeUser(user),
+        });
+    } else {
+        throw new UnauthorizedError('La contraseña ingresada es incorrecta o expirada');
+    }
+};
+
 const refreshToken = (req, res) => {
     const { id, email } = req.user;
     res.json({
@@ -117,4 +143,5 @@ module.exports = {
     checkAuth,
     forgotPassword,
     resetPassword,
+    otp,
 };

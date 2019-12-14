@@ -34,6 +34,10 @@ const updateAvatar = async (userId, imageUrl) => UserModel.findByIdAndUpdate(
     userId, { avatarURL: imageUrl }, { new: true },
 ).lean().exec();
 
+const resetOtp = async (email) => {
+    await UserModel.updateOne({ email }, { otp: '' });
+};
+
 const sendForgotPasswordEmail = async (email) => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -50,7 +54,7 @@ const sendForgotPasswordEmail = async (email) => {
 
     const otpExpiration = (new Date()).setDate((new Date()).getDate() + 1);
 
-    const res = await UserModel.updateOne({ email }, { otp: tempPass, otpExpiration });
+    await UserModel.updateOne({ email }, { otp: tempPass, otpExpiration });
     const mailOptions = {
         from: memoEmail,
         to: email,
@@ -79,4 +83,5 @@ module.exports = {
     updateAvatar,
     sendForgotPasswordEmail,
     changePassword,
+    resetOtp,
 };
