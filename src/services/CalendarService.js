@@ -47,8 +47,8 @@ const findSectionsForToday = async (dateString, currentUserId) => {
         const { from } = s.schedule[day];
         const { to } = s.schedule[day];
 
-        const startHours = (new Date(date)).setHours(from, 0, 0, 0);
-        const endHours = (new Date(date)).setHours(to, 0, 0, 0);
+        const startHours = (new Date(date)).setHours(from + 4, 0, 0, 0);
+        const endHours = (new Date(date)).setHours(to + 4, 0, 0, 0);
         const schedule = {
             from: startHours,
             to: endHours,
