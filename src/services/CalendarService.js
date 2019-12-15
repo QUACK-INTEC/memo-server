@@ -25,8 +25,7 @@ const findEventsByDate = async (dateString, currentUserId, section, isPublic) =>
     if (section) query.section = section;
     const posts = await PostModel
         .find(query)
-        .populate('author')
-        .lean()
+        .lean({ autopopulate: true })
         .exec();
     return posts;
 };
@@ -41,8 +40,7 @@ const findSectionsForToday = async (dateString, currentUserId) => {
         .find({
             [`schedule.${day}`]: { $exists: true, $ne: null },
         })
-        .populate('subject', 'name code university')
-        .lean()
+        .lean({ autopopulate: true })
         .exec();
     const result = sections.map((s) => {
         const { from } = s.schedule[day];

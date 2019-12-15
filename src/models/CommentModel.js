@@ -14,11 +14,14 @@ const CommentModel = new Schema({
         type: ObjectId,
         required: true,
         ref: 'user',
+        autopopulate: true,
     },
     reactions: {
         type: [ReactionModel.schema],
         required: false,
     },
 }, { timestamps: true });
+
+CommentModel.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model('comment', CommentModel);

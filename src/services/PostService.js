@@ -7,10 +7,8 @@ const ForbiddenError = require('../constants/errors/ForbiddenError');
 const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
-        .populate({ path: 'comments.author', model: 'user' })
         .populate({ path: 'comments.reactions.author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
-        .populate('author')
         .populate('attachments')
         .populate({
             path: 'subtasks',

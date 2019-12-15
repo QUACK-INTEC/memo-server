@@ -23,8 +23,6 @@ const getPermanentResources = async (subjectId) => {
     const posts = await PostModel.find({
         section: { $in: sectionIds },
     })
-        .populate('section')
-        .populate('author')
         .populate({
             path: 'attachments',
             model: 'attachment',
@@ -33,7 +31,7 @@ const getPermanentResources = async (subjectId) => {
                 model: 'user',
             },
         })
-        .lean()
+        .lean({ autopopulate: true })
         .exec();
     posts.forEach((p) => {
         teachersMap[p.section.professorName] = [

@@ -75,11 +75,14 @@ const SectionModel = new Schema({
         type: ObjectId,
         required: true,
         ref: 'subject',
+        autopopulate: true,
     },
     discriminator: {
         type: String,
         required: true,
     },
 }, { timestamps: true });
+
+SectionModel.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model('section', SectionModel);

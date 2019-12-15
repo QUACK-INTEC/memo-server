@@ -85,7 +85,7 @@ describe('Posts', () => {
             newPost.description.should.eql(postData.description);
             newPost.type.should.eql(postData.type);
             newPost.isPublic.should.eql(postData.isPublic);
-            newPost.author.toString().should.eql(userId);
+            newPost.author._id.toString().should.eql(userId);
             newPost.startDate.should.eql(postData.startDate);
             newPost.endDate.should.eql(postData.endDate);
         });
@@ -120,7 +120,7 @@ describe('Posts', () => {
             newPost.description.should.eql(postData.description);
             newPost.type.should.eql(postData.type);
             newPost.isPublic.should.eql(postData.isPublic);
-            newPost.author.toString().should.eql(userId);
+            newPost.author._id.toString().should.eql(userId);
             newPost.attachments.should.be.an('array').that.includes(attachment._id);
         });
 
