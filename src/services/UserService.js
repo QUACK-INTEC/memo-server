@@ -2,8 +2,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { UserModel } = require('../models');
 
-const memoEmail = 'memostudentapp@gmail.com';
-const memoPassword = 'Fr4nc1n3';
+const { EMAIL_ADDRESS, EMAIL_PASSWORD } = require('../config/config');
 
 const NotFoundError = require('../constants/errors/NotFoundError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
@@ -42,8 +41,8 @@ const sendForgotPasswordEmail = async (email) => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: memoEmail,
-            pass: memoPassword,
+            user: EMAIL_ADDRESS,
+            pass: EMAIL_PASSWORD,
         },
     });
 
@@ -56,7 +55,7 @@ const sendForgotPasswordEmail = async (email) => {
 
     await UserModel.updateOne({ email }, { otp: tempPass, otpExpiration });
     const mailOptions = {
-        from: memoEmail,
+        from: EMAIL_ADDRESS,
         to: email,
         subject: 'Memo: Recover your password',
         text: `Your 24 hours valid and one time password is: ${tempCode}`,
