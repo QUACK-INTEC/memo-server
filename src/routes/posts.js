@@ -17,6 +17,11 @@ router.post('/:id/resetvote', passport.authenticate('jwt', { session: false }), 
 router.post('/:postId/comment', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.addComment));
 router.delete('/:postId/comment/:commentId', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.deleteComment));
 
+router.post('/comments/:commentId/upvote', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.upVoteComment));
+router.post('/comments/:commentId/downvote', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.downVoteComment));
+router.post('/comments/:commentId/resetvote', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.resetVoteComment));
+
+
 router.post('/:postId/subtask', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.addSubtask));
 router.put('/:postId/subtask/:taskId', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.updateSubtask));
 router.delete('/:postId/subtask/:taskId', passport.authenticate('jwt', { session: false }), asyncHandler(PostController.deleteSubtask));
