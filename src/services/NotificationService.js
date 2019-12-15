@@ -18,7 +18,7 @@ const registerToken = async (userId, expoPushToken) => {
 };
 
 const sendNewPostNotification = async (newPost) => {
-    const section = await SectionModel.findById(newPost.section).populate('students').populate('subject');
+    const section = await SectionModel.findById(newPost.section).populate('students');
 
     const recipients = section.students.reduce((tokens, user) => {
         if (user._id.toString() !== newPost.author._id.toString()

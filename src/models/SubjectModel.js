@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const SectionModel = require('./SectionModel.js');
-
 const { Schema } = mongoose;
 
 const { String, ObjectId } = Schema.Types;
@@ -20,10 +18,6 @@ const subjectModel = new Schema({
         type: ObjectId,
         ref: 'university',
         required: true,
-    },
-    sections: {
-        type: [SectionModel.schema],
-        required: false,
     },
 }, { timestamps: true });
 

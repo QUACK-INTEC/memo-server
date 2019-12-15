@@ -34,11 +34,6 @@ const UserModel = new Schema({
     lastSync: {
         type: Date,
     },
-    sections: [{
-        type: ObjectId,
-        required: false,
-        ref: 'section',
-    }],
     expoPushToken: String,
 }, {
     timestamps: true,
