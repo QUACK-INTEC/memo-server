@@ -25,6 +25,7 @@ const findEventsByDate = async (dateString, currentUserId, section, isPublic) =>
     if (section) query.section = section;
     const posts = await PostModel
         .find(query)
+        .populate('author')
         .lean()
         .exec();
     return posts;
