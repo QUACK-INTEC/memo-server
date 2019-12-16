@@ -14,18 +14,25 @@ const findById = async (id, userId) => {
             path: 'subtasks',
             match: { author: userId },
         })
+        .lean({ virtuals: true, autopopulate: true })
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
     result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
 
-    result.comments = result.comments.map((comment) => ({
-        ...comment,
-        currentUserReaction:
+    const comments = result.comments.map((comment) => {
+        const newComment = {
+            ...comment,
+            currentUserReaction:
             comment.reactions.find((r) => String(r.author._id) === String(userId)),
-    }));
-    return result;
+        };
+        return newComment;
+    });
+    return {
+        ...result,
+        comments,
+    };
 };
 
 const awardPointsForPost = async (author) => {

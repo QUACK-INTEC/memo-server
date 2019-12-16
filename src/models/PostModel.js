@@ -63,6 +63,7 @@ PostModel.virtual('subtasks', {
     localField: '_id',
     foreignField: 'post',
 });
+PostModel.plugin(require('mongoose-lean-virtuals'));
 
 PostModel.plugin(require('mongoose-autopopulate'));
 
