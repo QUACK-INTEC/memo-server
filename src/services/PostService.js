@@ -8,24 +8,32 @@ const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
         .populate({ path: 'comments.reactions.author', model: 'user' })
+        .populate({ path: 'comments.author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
         .populate('attachments')
         .populate({
             path: 'subtasks',
             match: { author: userId },
         })
+        .lean()
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
     result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
 
-    result.comments = result.comments.map((comment) => ({
-        ...comment,
-        currentUserReaction:
+    const comments = result.comments.map((comment) => {
+        const newComment = {
+            ...comment,
+            currentUserReaction:
             comment.reactions.find((r) => String(r.author._id) === String(userId)),
-    }));
-    return result;
+        };
+        return newComment;
+    });
+    return {
+        ...result,
+        comments,
+    };
 };
 
 const awardPointsForPost = async (author) => {
