@@ -150,6 +150,33 @@ const resetVote = async (req, res) => {
     });
 };
 
+const upVoteComment = async (req, res) => {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.upVoteComment(commentId, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const downVoteComment = async (req, res) => {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.downVoteComment(commentId, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const resetVoteComment = async (req, res) => {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.resetVoteComment(commentId, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
 const addSubtask = async (req, res) => {
     const { name } = req.body;
 
@@ -232,6 +259,9 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    upVoteComment,
+    downVoteComment,
+    resetVoteComment,
     addComment,
     deleteComment,
 };

@@ -35,6 +35,7 @@ const PostModel = new Schema({
         type: ObjectId,
         required: true,
         ref: 'user',
+        autopopulate: true,
     },
     reactions: {
         type: [ReactionModel.schema],
@@ -53,6 +54,7 @@ const PostModel = new Schema({
         type: ObjectId,
         required: true,
         ref: 'section',
+        autopopulate: true,
     },
 }, { timestamps: true });
 
@@ -61,5 +63,7 @@ PostModel.virtual('subtasks', {
     localField: '_id',
     foreignField: 'post',
 });
+
+PostModel.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model('post', PostModel);

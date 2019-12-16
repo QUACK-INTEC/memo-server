@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 const { PostModel, SubTaskModel, UserModel } = require('../models');
+const NotificationService = require('./NotificationService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 
 const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
-        .populate({ path: 'comments.author', model: 'user' })
         .populate({ path: 'comments.reactions.author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
-        .populate('author')
         .populate('attachments')
         .populate({
             path: 'subtasks',
@@ -40,6 +39,11 @@ const awardPointsForPost = async (author) => {
 
 const create = async (data) => {
     const result = await new PostModel(data).save();
+
+    if (result.isPublic) {
+        await NotificationService.sendNewPostNotification(result);
+    }
+
     return result;
 };
 
@@ -102,6 +106,46 @@ const removePointsForPost = async (author) => {
     ).lean().exec();
 };
 
+const resetVoteComment = async (id, userId) => {
+    const post = await PostModel.findOne(
+        {
+            'comments._id': id,
+        },
+    )
+        .exec();
+    const comment = post.comments.id(id);
+    const reactions = [];
+    comment.reactions.forEach((r) => {
+        if (String(r.author) !== String(userId)) {
+            reactions.push(r);
+        }
+    });
+
+    const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
+        $set:
+        { 'comments.$.reactions': reactions },
+    }, { upsert: true });
+    return result;
+};
+
+
+const changeVoteComment = async (id, userId, value) => {
+    await resetVoteComment(id, userId);
+    const reaction = {
+        author: userId,
+        value,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+    };
+    const result = await PostModel.update({ 'comments._id': id }, {
+        $push:
+        { 'comments.$.reactions': reaction },
+    });
+    return result;
+};
+
+const upVoteComment = async (id, userId) => changeVoteComment(id, userId, 1);
+const downVoteComment = async (id, userId) => changeVoteComment(id, userId, -1);
 
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
 
@@ -195,6 +239,9 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    upVoteComment,
+    downVoteComment,
+    resetVoteComment,
     addComment,
     deleteComment,
     awardPointsForPost,

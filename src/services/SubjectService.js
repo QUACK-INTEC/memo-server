@@ -23,13 +23,22 @@ const getPermanentResources = async (subjectId) => {
     const posts = await PostModel.find({
         section: { $in: sectionIds },
     })
-        .populate('section')
-        .populate('author')
-        .populate('attachments')
-        .lean()
+        .populate({
+            path: 'attachments',
+            model: 'attachment',
+            populate: {
+                path: 'uploadedBy',
+                model: 'user',
+            },
+        })
+        .lean({ autopopulate: true })
         .exec();
-
-    posts.forEach((p) => teachersMap[p.section.professorName].push(p));
+    posts.forEach((p) => {
+        teachersMap[p.section.professorName] = [
+            ...teachersMap[p.section.professorName],
+            ...p.attachments,
+        ];
+    });
 
     const result = Object.keys(teachersMap).map((teacher) => ({ teacherName: teacher, resources: teachersMap[teacher] }));
     return result;

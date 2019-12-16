@@ -31,6 +31,7 @@ const sync = async (req, res) => {
             sectionData.name,
         );
         const section = await SectionService.updateOrCreate({
+            active: true,
             code: sectionData.section,
             subject: subject._id,
             professorName: sectionData.professor,

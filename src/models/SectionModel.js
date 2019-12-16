@@ -16,12 +16,30 @@ const ScheduleDaySchema = new Schema({
 });
 
 const ScheduleSchema = new Schema({
-    monday: ScheduleDaySchema,
-    tuesday: ScheduleDaySchema,
-    wednesday: ScheduleDaySchema,
-    thursday: ScheduleDaySchema,
-    friday: ScheduleDaySchema,
-    saturday: ScheduleDaySchema,
+    monday: {
+        type: ScheduleDaySchema,
+        required: false,
+    },
+    tuesday: {
+        type: ScheduleDaySchema,
+        required: false,
+    },
+    wednesday: {
+        type: ScheduleDaySchema,
+        required: false,
+    },
+    thursday: {
+        type: ScheduleDaySchema,
+        required: false,
+    },
+    friday: {
+        type: ScheduleDaySchema,
+        required: false,
+    },
+    saturday: {
+        type: ScheduleDaySchema,
+        required: false,
+    },
 });
 
 const SectionModel = new Schema({
@@ -57,11 +75,14 @@ const SectionModel = new Schema({
         type: ObjectId,
         required: true,
         ref: 'subject',
+        autopopulate: true,
     },
     discriminator: {
         type: String,
         required: true,
     },
 }, { timestamps: true });
+
+SectionModel.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model('section', SectionModel);

@@ -9,8 +9,7 @@ const findMySections = async (userId) => {
     const result = await SectionModel
         .find({ students: id, active: true })
         .populate('students', 'firstName lastName email points')
-        .populate('subject', 'name code university')
-        .lean()
+        .lean({ autopopulate: true })
         .exec();
     return result;
 };
@@ -23,8 +22,8 @@ const getCommonSections = async (firstUserId, secondUserId) => SectionModel.find
 const findById = async (id) => {
     const result = await SectionModel
         .findById(id)
-        .populate('subject', 'name code university')
-        .lean().exec();
+        .lean({ autopopulate: true })
+        .exec();
 
     if (result == null) {
         throw new NotFoundError('Seccion no encontrada');
@@ -45,9 +44,8 @@ const updateOrCreate = async (sectionData) => {
 const findSectionsStudents = async (id) => {
     const res = await SectionModel
         .findById(id)
-        .populate('students', 'firstName lastName email points')
-        .populate('subject', 'name code university')
-        .lean()
+        .populate('students', 'firstName lastName email points avatarURL')
+        .lean({ autopopulate: true })
         .exec();
 
     if (res == null) {
@@ -72,9 +70,8 @@ const findSectionsPosts = async (id, currentUserId) => {
                 { isPublic: false, author: currentUserId },
             ],
         })
-        .populate('author')
         .populate({ path: 'reactions.author', model: 'user' })
-        .lean()
+        .lean({ autopopulate: true })
         .exec();
     return posts;
 };
