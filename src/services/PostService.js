@@ -16,7 +16,7 @@ const findById = async (id, userId) => {
             path: 'subtasks',
             match: { author: userId },
         })
-        .lean()
+        .lean({ virtuals: true })
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
