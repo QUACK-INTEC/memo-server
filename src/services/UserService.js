@@ -62,12 +62,8 @@ const sendForgotPasswordEmail = async (email) => {
         text: `Su contraseña de uso único y 24 hours de validez es: ${tempCode}`,
     };
 
-
     const result = await transporter.sendMail(mailOptions);
     const success = result.accepted && result.accepted.length > 0;
-    if (!success) {
-        throw new ServerError('No se puedo enviar el email.');
-    }
     return success;
 };
 

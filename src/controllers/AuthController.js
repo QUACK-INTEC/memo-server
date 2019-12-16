@@ -110,6 +110,7 @@ const forgotPassword = async (req, res) => {
         throw new MissingFieldError('Email no existe');
     }
     const success = await UserService.sendForgotPasswordEmail(email);
+
     res.json({ success });
 };
 
