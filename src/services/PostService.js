@@ -35,15 +35,6 @@ const findById = async (id, userId) => {
     };
 };
 
-const awardPointsForPost = async (author) => {
-    const user = await UserModel.findById(author);
-    const points = user.points + 50;
-    await UserModel.findOneAndUpdate(
-        { _id: author },
-        { points },
-    ).lean().exec();
-};
-
 const create = async (data) => {
     const result = await new PostModel(data).save();
 
@@ -103,15 +94,6 @@ const changeVote = async (id, userId, value) => {
 
 const upVote = async (id, userId) => changeVote(id, userId, 1);
 const downVote = async (id, userId) => changeVote(id, userId, -1);
-
-const removePointsForPost = async (author) => {
-    const user = await UserModel.findById(author);
-    const points = user.points - 50;
-    await UserModel.findOneAndUpdate(
-        { _id: author },
-        { points },
-    ).lean().exec();
-};
 
 const resetVoteComment = async (id, userId) => {
     const post = await PostModel.findOne(
@@ -251,6 +233,4 @@ module.exports = {
     resetVoteComment,
     addComment,
     deleteComment,
-    awardPointsForPost,
-    removePointsForPost,
 };

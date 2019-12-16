@@ -1,11 +1,14 @@
 
 const SectionService = require('../services/SectionService');
 const PostService = require('../services/PostService');
+const UserService = require('../services/UserService');
 const { serializePost, serializeTask, serializeComment } = require('../utils/serializers');
 
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
 const MissingFieldError = require('../constants/errors/MissingFieldError');
+
+const { POINTS_PER_POST } = require('../constants/points');
 
 const create = async (req, res) => {
     const {
@@ -45,7 +48,7 @@ const create = async (req, res) => {
         author: req.user.id,
     });
 
-    await PostService.awardPointsForPost(post.author);
+    await UserService.awardPoints(post.author, POINTS_PER_POST);
 
     res.json({
         success: true,
@@ -115,7 +118,7 @@ const deletePost = async (req, res) => {
     }
 
     const result = await PostService.deletePost(id);
-    await PostService.removePointsForPost(post.author);
+    await UserService.awardPoints(post.author, -POINTS_PER_POST);
 
     const success = result.ok > 0 && result.n > 0;
     res.json({
