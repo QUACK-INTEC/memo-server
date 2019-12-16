@@ -9,14 +9,13 @@ const findById = async (id, userId) => {
         .findById(id)
         .populate({ path: 'comments.reactions.author', model: 'user' })
         .populate({ path: 'comments.author', model: 'user' })
-        .populate({ path: 'author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
         .populate('attachments')
         .populate({
             path: 'subtasks',
             match: { author: userId },
         })
-        .lean({ virtuals: true })
+        .lean({ virtuals: true, autopopulate: true })
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
