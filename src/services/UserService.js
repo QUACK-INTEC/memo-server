@@ -6,6 +6,7 @@ const { EMAIL_ADDRESS, EMAIL_PASSWORD } = require('../config/config');
 
 const NotFoundError = require('../constants/errors/NotFoundError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
+const ServerError = require('../constants/errors/ServerError');
 
 const create = async (userInfo) => {
     try {
@@ -57,17 +58,16 @@ const sendForgotPasswordEmail = async (email) => {
     const mailOptions = {
         from: EMAIL_ADDRESS,
         to: email,
-        subject: 'Memo: Recover your password',
-        text: `Your 24 hours valid and one time password is: ${tempCode}`,
+        subject: 'Memo: Recuperar contraseña',
+        text: `Su contraseña de uso único y 24 hours de validez es: ${tempCode}`,
     };
 
 
-    let success = true;
-    transporter.sendMail(mailOptions, (error) => {
-        if (error) {
-            success = false;
-        }
-    });
+    const result = await transporter.sendMail(mailOptions);
+    const success = result.accepted && result.accepted.length > 0;
+    if (!success) {
+        throw new ServerError('No se puedo enviar el email.');
+    }
     return success;
 };
 

@@ -105,7 +105,7 @@ const checkAuth = (req, res) => {
 
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
-    const user = await UserService.findOne({ email });
+    const user = await UserService.findOne({ email: email.toLowerCase() });
     if (!user) {
         throw new MissingFieldError('Email no existe');
     }
