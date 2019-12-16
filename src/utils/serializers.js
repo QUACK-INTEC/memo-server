@@ -1,3 +1,5 @@
+const { Types } = require('mongoose');
+
 const serializeUser = (userObj) => ({
     id: userObj._id,
     avatarURL: userObj.avatarURL,
@@ -30,28 +32,6 @@ const serializeComment = (c) => ({
     author: serializeUser(c.author),
 });
 
-const serializeSimplePost = (p) => ({
-    id: p._id,
-    title: p.title,
-    section: p.section,
-    startDate: p.startDate,
-    endDate: p.endDate,
-    type: p.type,
-    author: p.author && serializeUser(p.author),
-    currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
-    isPublic: p.isPublic,
-    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : 0,
-    createdAt: p.createdAt,
-});
-
-const serializePost = (p) => ({
-    ...serializeSimplePost(p),
-    description: p.description,
-    comments: p.comments ? p.comments.map(serializeComment) : [],
-    attachments: p.attachments ? p.attachments.map(serializeAttachment) : [],
-    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : [],
-});
-
 const serializeSchedule = (obj) => ({
     monday: obj.monday ? { from: obj.monday.from, to: obj.monday.to } : undefined,
     tuesday: obj.tuesday ? { from: obj.tuesday.from, to: obj.tuesday.to } : undefined,
@@ -82,6 +62,28 @@ const serializeSection = (obj) => ({
     code: obj.code,
     active: obj.active,
     subject: serializeSubject(obj.subject),
+});
+
+const serializeSimplePost = (p) => ({
+    id: p._id,
+    title: p.title,
+    section: p.section && Types.ObjectId.isValid(p.section) ? p.section : serializeSection(p.section),
+    startDate: p.startDate,
+    endDate: p.endDate,
+    type: p.type,
+    author: p.author && serializeUser(p.author),
+    currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
+    isPublic: p.isPublic,
+    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : 0,
+    createdAt: p.createdAt,
+});
+
+const serializePost = (p) => ({
+    ...serializeSimplePost(p),
+    description: p.description,
+    comments: p.comments ? p.comments.map(serializeComment) : [],
+    attachments: p.attachments ? p.attachments.map(serializeAttachment) : [],
+    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : [],
 });
 
 const serializeUniversity = (uni) => ({
