@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { PostModel, SubTaskModel } = require('../models');
+const { PostModel, SubTaskModel, UserModel } = require('../models');
 const NotificationService = require('./NotificationService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
@@ -28,6 +28,15 @@ const findById = async (id, userId) => {
     return result;
 };
 
+const awardPointsForPost = async (author) => {
+    const user = await UserModel.findById(author);
+    const points = user.points + 50;
+    await UserModel.findOneAndUpdate(
+        { _id: author },
+        { points },
+    ).lean().exec();
+};
+
 const create = async (data) => {
     const result = await new PostModel(data).save();
 
@@ -37,6 +46,7 @@ const create = async (data) => {
 
     return result;
 };
+
 
 const update = async (postData) => {
     const { id } = postData;
@@ -87,6 +97,15 @@ const changeVote = async (id, userId, value) => {
 const upVote = async (id, userId) => changeVote(id, userId, 1);
 const downVote = async (id, userId) => changeVote(id, userId, -1);
 
+const removePointsForPost = async (author) => {
+    const user = await UserModel.findById(author);
+    const points = user.points - 50;
+    await UserModel.findOneAndUpdate(
+        { _id: author },
+        { points },
+    ).lean().exec();
+};
+
 const resetVoteComment = async (id, userId) => {
     const post = await PostModel.findOne(
         {
@@ -129,6 +148,7 @@ const upVoteComment = async (id, userId) => changeVoteComment(id, userId, 1);
 const downVoteComment = async (id, userId) => changeVoteComment(id, userId, -1);
 
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
+
 
 const addSubtask = async (data) => new SubTaskModel(data).save();
 
@@ -224,4 +244,6 @@ module.exports = {
     resetVoteComment,
     addComment,
     deleteComment,
+    awardPointsForPost,
+    removePointsForPost,
 };

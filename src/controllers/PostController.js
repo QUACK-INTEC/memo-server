@@ -44,6 +44,9 @@ const create = async (req, res) => {
         isPublic,
         author: req.user.id,
     });
+
+    await PostService.awardPointsForPost(post.author);
+
     res.json({
         success: true,
         data: serializePost(post),
@@ -112,6 +115,8 @@ const deletePost = async (req, res) => {
     }
 
     const result = await PostService.deletePost(id);
+    await PostService.removePointsForPost(post.author);
+
     const success = result.ok > 0 && result.n > 0;
     res.json({
         success,
