@@ -39,16 +39,19 @@ const UserModel = new Schema({
         type: Number,
         default: 0,
     },
+    rank: {
+        type: ObjectId,
+        ref: 'rank',
+        autopopulate: true,
+    },
     lastSync: {
         type: Date,
     },
-    sections: [{
-        type: ObjectId,
-        required: false,
-        ref: 'section',
-    }],
+    expoPushToken: String,
 }, {
     timestamps: true,
 });
+
+UserModel.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model('user', UserModel);

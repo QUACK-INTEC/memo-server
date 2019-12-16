@@ -1,5 +1,5 @@
 const SectionService = require('../services/SectionService');
-const { serializeSection, serializeSectionStudent, serializeSimplePost } = require('../utils/serializers');
+const { serializeSection, serializeUser, serializeSimplePost } = require('../utils/serializers');
 
 const getMySections = async (req, res) => {
     const { id } = req.user;
@@ -25,7 +25,7 @@ const sectionStudents = async (req, res) => {
     const students = await SectionService.findSectionsStudents(id);
     res.json({
         success: true,
-        data: students.map((s) => (serializeSectionStudent(s))),
+        data: students.map((s) => (serializeUser(s))),
     });
 };
 

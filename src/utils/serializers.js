@@ -1,3 +1,12 @@
+const { Types } = require('mongoose');
+
+const serializeRank = (rank) => ({
+    level: rank.level,
+    name: rank.name,
+    badgeUrl: rank.badgeUrl,
+    maxPoints: rank.maxPoints,
+});
+
 const serializeUser = (userObj) => ({
     id: userObj._id,
     avatarURL: userObj.avatarURL,
@@ -5,12 +14,14 @@ const serializeUser = (userObj) => ({
     firstName: userObj.firstName,
     lastName: userObj.lastName,
     points: userObj.points,
+    rank: userObj.rank && serializeRank(userObj.rank),
 });
 
 const serializeAttachment = (att) => ({
     id: att._id,
     fileURL: att.fileURL,
     name: att.name,
+    uploadedBy: att.uploadedBy && serializeUser(att.uploadedBy),
 });
 
 const serializeTask = (task) => ({
@@ -27,28 +38,6 @@ const serializeComment = (c) => ({
     score: c.reactions ? c.reactions.reduce(totalReactions, 0) : 0,
     currentUserReaction: c.currentUserReaction && c.currentUserReaction.value,
     author: serializeUser(c.author),
-});
-
-const serializeSimplePost = (p) => ({
-    id: p._id,
-    title: p.title,
-    section: p.section,
-    startDate: p.startDate,
-    endDate: p.endDate,
-    type: p.type,
-    author: p.author && serializeUser(p.author),
-    currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
-    isPublic: p.isPublic,
-    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : 0,
-    createdAt: p.createdAt,
-});
-
-const serializePost = (p) => ({
-    ...serializeSimplePost(p),
-    description: p.description,
-    comments: p.comments ? p.comments.map(serializeComment) : [],
-    attachments: p.attachments ? p.attachments.map(serializeAttachment) : [],
-    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : [],
 });
 
 const serializeSchedule = (obj) => ({
@@ -70,7 +59,7 @@ const serializeSubject = (obj) => ({
 
 const serializeSubjectWithResources = (obj) => ({
     teacherName: obj.teacherName,
-    resources: obj.resources.map(serializeSimplePost),
+    resources: obj.resources.map(serializeAttachment),
 });
 
 const serializeSection = (obj) => ({
@@ -83,12 +72,26 @@ const serializeSection = (obj) => ({
     subject: serializeSubject(obj.subject),
 });
 
-const serializeSectionStudent = (s) => ({
-    id: s._id,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    email: s.email,
-    points: s.points,
+const serializeSimplePost = (p) => ({
+    id: p._id,
+    title: p.title,
+    section: p.section && Types.ObjectId.isValid(p.section) ? p.section : serializeSection(p.section),
+    startDate: p.startDate,
+    endDate: p.endDate,
+    type: p.type,
+    author: p.author && serializeUser(p.author),
+    currentUserReaction: p.currentUserReaction && p.currentUserReaction.value,
+    isPublic: p.isPublic,
+    score: p.reactions ? p.reactions.reduce(totalReactions, 0) : 0,
+    createdAt: p.createdAt,
+});
+
+const serializePost = (p) => ({
+    ...serializeSimplePost(p),
+    description: p.description,
+    comments: p.comments ? p.comments.map(serializeComment) : [],
+    attachments: p.attachments ? p.attachments.map(serializeAttachment) : [],
+    subtasks: p.subtasks ? p.subtasks.map(serializeTask) : [],
 });
 
 const serializeUniversity = (uni) => ({
@@ -101,7 +104,6 @@ const serializeUniversity = (uni) => ({
 module.exports = {
     serializeUser,
     serializeSection,
-    serializeSectionStudent,
     serializeUniversity,
     serializeSimplePost,
     serializePost,
