@@ -9,6 +9,7 @@ const findById = async (id, userId) => {
         .findById(id)
         .populate({ path: 'comments.reactions.author', model: 'user' })
         .populate({ path: 'comments.author', model: 'user' })
+        .populate({ path: 'author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
         .populate('attachments')
         .populate({
