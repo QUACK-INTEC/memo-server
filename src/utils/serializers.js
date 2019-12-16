@@ -1,5 +1,12 @@
 const { Types } = require('mongoose');
 
+const serializeRank = (rank) => ({
+    level: rank.level,
+    name: rank.name,
+    badgeUrl: rank.badgeUrl,
+    maxPoints: rank.maxPoints,
+});
+
 const serializeUser = (userObj) => ({
     id: userObj._id,
     avatarURL: userObj.avatarURL,
@@ -7,6 +14,7 @@ const serializeUser = (userObj) => ({
     firstName: userObj.firstName,
     lastName: userObj.lastName,
     points: userObj.points,
+    rank: userObj.rank && serializeRank(userObj.rank),
 });
 
 const serializeAttachment = (att) => ({
