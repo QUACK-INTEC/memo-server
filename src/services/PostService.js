@@ -220,7 +220,7 @@ const deleteComment = async (postId, authorId, commentId) => {
         throw new NotFoundError('Comentario no encontrado');
     }
 
-    if (comment.author.toString() !== authorId.toString()) {
+    if (comment.author._id.toString() !== authorId.toString()) {
         throw new ForbiddenError('Este comentario no le pertenece!');
     }
 
