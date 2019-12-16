@@ -29,9 +29,20 @@ const updateAvatar = async (userId, imageUrl) => UserModel.findByIdAndUpdate(
     userId, { avatarURL: imageUrl }, { new: true },
 ).lean().exec();
 
+const awardPoints = async (userId, points) => {
+    await UserModel.findByIdAndUpdate(
+        userId, {
+            $inc: {
+                points,
+            },
+        },
+    ).lean().exec();
+};
+
 module.exports = {
     create,
     findById,
     findOne,
     updateAvatar,
+    awardPoints,
 };
