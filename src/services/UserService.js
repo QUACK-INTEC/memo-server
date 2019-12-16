@@ -59,7 +59,7 @@ const sendForgotPasswordEmail = async (email) => {
         from: EMAIL_ADDRESS,
         to: email,
         subject: 'Memo: Recuperar contraseña',
-        text: `Su contraseña de uso único y 24 hours de validez es: ${tempCode}`,
+        text: `Su contraseña de uso único y 24 horas de validez es: ${tempCode}`,
     };
 
     const result = await transporter.sendMail(mailOptions);
