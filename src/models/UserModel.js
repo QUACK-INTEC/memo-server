@@ -44,9 +44,15 @@ const UserModel = new Schema({
         ref: 'rank',
         autopopulate: true,
     },
-    lastSync: {
-        type: Date,
-    },
+    syncStatus: [{
+        university: {
+            type: ObjectId,
+            ref: 'university',
+            required: true,
+        },
+        syncDate: Date,
+        discriminator: String,
+    }],
     expoPushToken: String,
 }, {
     timestamps: true,
