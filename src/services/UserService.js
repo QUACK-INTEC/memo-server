@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-const { UserModel, RankModel } = require('../models');
+const { UserModel, RankModel, UniversityModel } = require('../models');
 
 const { EMAIL_ADDRESS, EMAIL_PASSWORD } = require('../config/config');
 
@@ -97,6 +97,38 @@ const awardPoints = async (userId, amount) => {
     }
 };
 
+const updateSyncStatus = async (userId, universityId, discriminator, syncDate) => {
+    const updateRes = await UserModel.updateOne(
+        { _id: userId, 'syncStatus.university': universityId },
+        { $set: { 'syncStatus.$.syncDate': syncDate, 'syncStatus.$.discriminator': discriminator } },
+    );
+
+    if (updateRes.nModified === 0) {
+        await UserModel.findByIdAndUpdate(userId, {
+            $addToSet: { syncStatus: { syncDate, discriminator, university: universityId } },
+        }).lean().exec();
+    }
+};
+
+const checkSyncRequired = async (userId) => {
+    const user = await UserModel.findById(userId).lean().exec();
+
+    if (!user.syncStatus || user.syncStatus.length === 0) {
+        return true;
+    }
+
+    const requiredPromises = [];
+    user.syncStatus.forEach((status) => {
+        requiredPromises.push((async () => {
+            const university = await UniversityModel.findById(status.university).lean().exec();
+            return university.discriminator !== status.discriminator;
+        })());
+    });
+
+    const requiredResult = await Promise.all(requiredPromises);
+    return requiredResult.some((r) => r);
+};
+
 module.exports = {
     create,
     findById,
@@ -106,4 +138,6 @@ module.exports = {
     changePassword,
     resetOtp,
     awardPoints,
+    updateSyncStatus,
+    checkSyncRequired,
 };
