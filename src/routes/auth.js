@@ -8,9 +8,9 @@ const router = express.Router();
 router.post('/register', asyncHandler(AuthController.register));
 router.post('/login', asyncHandler(AuthController.login));
 router.post('/otp', asyncHandler(AuthController.otp));
+router.post('/forgot', asyncHandler(AuthController.forgotPassword));
 router.get('/refresh', passport.authenticate('jwt', { session: false }), AuthController.refreshToken);
 router.get('/check', passport.authenticate('jwt', { session: false }), AuthController.checkAuth);
-router.post('/forgot', passport.authenticate('jwt', { session: false }), asyncHandler(AuthController.forgotPassword));
 router.post('/reset', passport.authenticate('jwt', { session: false }), AuthController.resetPassword);
 
 module.exports = router;
