@@ -15,6 +15,9 @@ const universityModel = new Schema({
         required: true,
         unique: true,
     },
+    discriminator: {
+        type: String,
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('university', universityModel);

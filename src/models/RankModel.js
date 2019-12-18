@@ -9,8 +9,17 @@ const RankModel = new Schema({
         type: Number,
         required: true,
     },
+    name: {
+        type: String,
+        required: true,
+    },
     badgeUrl: {
         type: String,
+        required: true,
+    },
+    maxPoints: {
+        type: Number,
+        unique: true,
         required: true,
     },
 }, { timestamps: true });
