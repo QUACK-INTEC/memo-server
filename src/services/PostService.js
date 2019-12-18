@@ -15,7 +15,7 @@ const findById = async (id, userId) => {
             path: 'subtasks',
             match: { author: userId },
         })
-        .lean()
+        .lean({ virtuals: true, autopopulate: true })
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
@@ -34,15 +34,6 @@ const findById = async (id, userId) => {
         ...result,
         comments,
     };
-};
-
-const awardPointsForPost = async (author) => {
-    const user = await UserModel.findById(author);
-    const points = user.points + 50;
-    await UserModel.findOneAndUpdate(
-        { _id: author },
-        { points },
-    ).lean().exec();
 };
 
 const create = async (data) => {
@@ -104,15 +95,6 @@ const changeVote = async (id, userId, value) => {
 
 const upVote = async (id, userId) => changeVote(id, userId, 1);
 const downVote = async (id, userId) => changeVote(id, userId, -1);
-
-const removePointsForPost = async (author) => {
-    const user = await UserModel.findById(author);
-    const points = user.points - 50;
-    await UserModel.findOneAndUpdate(
-        { _id: author },
-        { points },
-    ).lean().exec();
-};
 
 const resetVoteComment = async (id, userId) => {
     const post = await PostModel.findOne(
@@ -221,7 +203,7 @@ const deleteComment = async (postId, authorId, commentId) => {
         throw new NotFoundError('Comentario no encontrado');
     }
 
-    if (comment.author.toString() !== authorId.toString()) {
+    if (comment.author._id.toString() !== authorId.toString()) {
         throw new ForbiddenError('Este comentario no le pertenece!');
     }
 
@@ -252,6 +234,4 @@ module.exports = {
     resetVoteComment,
     addComment,
     deleteComment,
-    awardPointsForPost,
-    removePointsForPost,
 };

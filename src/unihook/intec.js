@@ -12,6 +12,26 @@ const BASE_URL = 'https://procesos.intec.edu.do';
 const DISCRIM_ROUTE = 'OfertaAcademica/Index';
 const DAY_NAMES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
+const formatTitle = (str) => {
+    const alwaysUp = ['i', 'ii', 'iii', 'iv'];
+    const alwaysLow = ['de', 'del'];
+    return str
+        .toLowerCase()
+        .split(' ')
+        .map((s) => {
+            if (alwaysUp.includes(s)) {
+                return s.toUpperCase();
+            }
+
+            if (alwaysLow.includes(s)) {
+                return s;
+            }
+
+            return s.charAt(0).toUpperCase() + s.substring(1);
+        })
+        .join(' ');
+};
+
 const parseSchedule = (html) => {
     const $ = cheerio.load(html);
     const classes = [];
@@ -35,8 +55,8 @@ const parseSchedule = (html) => {
             code: row.children().first().text().replace(/ +(?= )/g, ''),
             section: row.children(':nth-child(3)').text().replace(/ +(?= )/g, ''),
             room: row.children(':nth-child(4)').text().replace(/ +(?= )/g, ''),
-            name: row.children(':nth-child(2)').text(),
-            professor: row.children(':nth-child(12)').text().replace(/ +(?= )/g, ''),
+            name: formatTitle(row.children(':nth-child(2)').text()),
+            professor: formatTitle(row.children(':nth-child(12)').text().replace(/ +(?= )/g, '')),
             schedule,
         };
 

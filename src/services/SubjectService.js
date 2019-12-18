@@ -1,13 +1,10 @@
 const { PostModel, SubjectModel, SectionModel } = require('../models');
 
-const findOrCreate = async (university, code, name) => {
-    const subject = await SubjectModel.findOne({ university, code }).lean().exec();
-    if (subject) {
-        return subject;
-    }
-
-    return new SubjectModel({ university, code, name }).save();
-};
+const updateOrCreate = async (university, code, name) => SubjectModel.findOneAndUpdate(
+    { university, code },
+    { university, code, name },
+    { new: true, upsert: true },
+).lean().exec();
 
 const getPermanentResources = async (subjectId) => {
     const sections = await SectionModel.find({ subject: subjectId, active: false }).lean().exec();
@@ -45,6 +42,6 @@ const getPermanentResources = async (subjectId) => {
 };
 
 module.exports = {
-    findOrCreate,
+    updateOrCreate,
     getPermanentResources,
 };
