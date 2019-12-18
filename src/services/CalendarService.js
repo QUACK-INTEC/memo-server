@@ -17,10 +17,16 @@ const findEventsByDate = async (dateString, currentUserId, section, isPublic) =>
         or = [{ isPublic: false, author: currentUserId }];
     }
 
+
+    const sections = await SectionModel
+        .find({ students: currentUserId, active: true }).lean().exec();
+    const sectionIds = sections.map((s) => s._id);
+
     const query = {
         type: 'Event',
         endDate: { $gte: start, $lte: end },
         $or: or,
+        section: { $in: sectionIds },
     };
     if (section) query.section = section;
     const posts = await PostModel
