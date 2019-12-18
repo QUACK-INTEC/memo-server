@@ -8,7 +8,6 @@ const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
         .populate({ path: 'comments.reactions.author', model: 'user' })
-        .populate({ path: 'comments.author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
         .populate('attachments')
         .populate({
