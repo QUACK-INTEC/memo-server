@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { PostModel, SubTaskModel, UserModel } = require('../models');
+const { PostModel, SubTaskModel } = require('../models');
 const NotificationService = require('./NotificationService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
@@ -19,7 +19,9 @@ const findById = async (id, userId) => {
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
-    result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
+    result.currentUserReaction = result.reactions.find(
+        (r) => String(r.author && r.author._id) === String(userId),
+    );
 
     const comments = result.comments.map((comment) => {
         const newComment = {
