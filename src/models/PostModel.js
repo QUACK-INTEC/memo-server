@@ -13,7 +13,6 @@ const PostModel = new Schema({
     },
     description: {
         type: String,
-        required: true,
     },
     startDate: {
         type: Date,
