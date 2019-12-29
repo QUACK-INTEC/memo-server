@@ -4,4 +4,6 @@ module.exports = {
     AWS_S3_ENDPOINT: process.env.S3_ENDPOINT || 'nyc3.digitaloceanspaces.com',
     EMAIL_ADDRESS: process.env.EMAIL_ADDRESS || '',
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD || '',
+    REDIS_HOST: process.env.REDIS_HOST || '127.0.0.1',
+    REDIS_PORT: process.env.REDIS_PORT || '6379',
 };
