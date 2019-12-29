@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const { PostModel, SubTaskModel, UserModel } = require('../models');
+const { PostModel, SubTaskModel } = require('../models');
 const NotificationService = require('./NotificationService');
+const UserService = require('./UserService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 
@@ -104,12 +105,24 @@ const resetVoteComment = async (id, userId) => {
     )
         .exec();
     const comment = post.comments.id(id);
+
+    let valueOfPreviousReaction = 0;
+
     const reactions = [];
     comment.reactions.forEach((r) => {
         if (String(r.author) !== String(userId)) {
             reactions.push(r);
+            valueOfPreviousReaction = r.value;
         }
     });
+
+    if (valueOfPreviousReaction > 0) {
+        await UserService.awardPoints(comment.author.id, 5); // points author
+        await UserService.awardPoints(userId, 5); // points reactioner
+    } else if (valueOfPreviousReaction < 0) {
+        await UserService.awardPoints(comment.author.id, -5); // points reactioner
+        await UserService.awardPoints(userId, -5); // points reactioner
+    }
 
     const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
         $set:
@@ -131,6 +144,22 @@ const changeVoteComment = async (id, userId, value) => {
         $push:
         { 'comments.$.reactions': reaction },
     });
+
+    const post = await PostModel.findOne(
+        {
+            'comments._id': id,
+        },
+    )
+        .exec();
+    const comment = post.comments.id(id);
+
+    if (value > 0) {
+        await UserService.awardPoints(comment.author.id, 5); // points author
+        await UserService.awardPoints(userId, 5); // points reactioner
+    } else if (value < 0) {
+        await UserService.awardPoints(comment.author.id, -5); // points reactioner
+        await UserService.awardPoints(userId, -5); // points reactioner
+    }
     return result;
 };
 
@@ -187,6 +216,8 @@ const addComment = async (postId, userId, body) => {
         throw new NotFoundError('Publicacion no encontrada');
     }
 
+    UserService.awardPoints(userId, 5);
+
     return comment;
 };
 
@@ -214,6 +245,8 @@ const deleteComment = async (postId, authorId, commentId) => {
             },
         },
     });
+
+    UserService.awardPoints(authorId, -5);
 
     return !!(updateRes.ok && updateRes.nModified);
 };
