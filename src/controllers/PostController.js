@@ -22,7 +22,7 @@ const create = async (req, res) => {
         isPublic,
     } = req.body;
 
-    if (!title || !description || !type || isPublic === undefined || !section) {
+    if (!title || !type || isPublic === undefined || !section) {
         throw new MissingFieldError('Campos faltantes');
     }
 
@@ -69,7 +69,7 @@ const update = async (req, res) => {
         isPublic,
     } = req.body;
 
-    if (!title || !description || !type || isPublic === undefined || !section) {
+    if (!title || !type || isPublic === undefined || !section) {
         throw new MissingFieldError('Campos faltantes');
     }
 
