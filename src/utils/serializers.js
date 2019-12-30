@@ -72,13 +72,6 @@ const serializeSection = (obj) => ({
     subject: serializeSubject(obj.subject),
 });
 
-const getSectionForPost = (p) => {
-    if (p.section && Types.ObjectId.isValid(p.section)) {
-        return p.section;
-    }
-    return serializeSection(p.section);
-}n;
-
 const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
