@@ -21,7 +21,10 @@ const findById = async (id, userId) => {
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
-    result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
+    result.currentUserReaction = result.reactions.find((r) => {
+        const res = String(r.author && r.author._id) === String(userId);
+        return res;
+    });
 
     const comments = result.comments.map((comment) => {
         const newComment = {
