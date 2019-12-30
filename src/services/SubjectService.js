@@ -37,7 +37,10 @@ const getPermanentResources = async (subjectId) => {
         ];
     });
 
-    const result = Object.keys(teachersMap).map((teacher) => ({ teacherName: teacher, resources: teachersMap[teacher] }));
+    const result = Object.keys(teachersMap).map(
+        (teacher) => ({ teacherName: teacher, resources: teachersMap[teacher] }),
+    );
+
     return result;
 };
 

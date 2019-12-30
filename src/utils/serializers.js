@@ -82,7 +82,9 @@ const getSectionForPost = (p) => {
 const serializeSimplePost = (p) => ({
     id: p._id,
     title: p.title,
-    section: getSectionForPost(p),
+    section: p.section
+        && Types.ObjectId.isValid(p.section)
+        ? p.section : serializeSection(p.section),
     startDate: p.startDate,
     endDate: p.endDate,
     type: p.type,
