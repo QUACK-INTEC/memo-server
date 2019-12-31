@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 require('../src/database');
 
 const winston = require('winston');
@@ -44,12 +46,19 @@ const getRecipients = async (sectionId, authorId, isPublic) => {
         notifPromises.push((async () => {
             const participantTokens = await getRecipients(event.section._id,
                 event.author.toString(), event.isPublic);
+
+            const title = 'Se aproxima un evento';
+            const body = `${event.section.subject.name}: ${event.title}`;
+
             return {
+                _displayInForeground: true,
                 to: participantTokens,
                 sound: 'default',
-                title: 'Se aproxima un evento',
-                body: `${event.section.subject.name}: ${event.title}`,
+                title,
+                body,
                 data: {
+                    title,
+                    body,
                     postId: event._id,
                 },
             };
@@ -74,4 +83,6 @@ const getRecipients = async (sectionId, authorId, isPublic) => {
     });
 
     await Promise.all(pushPromises);
+
+    await mongoose.connection.close();
 })();
