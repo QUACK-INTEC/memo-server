@@ -53,7 +53,37 @@ const sendNewPostNotification = async (newPost) => {
     }
 };
 
+const sendNewCommentNotification = async (post, newComment) => {
+    const { body, author } = newComment;
+    const postAuthorUser = await UserModel.findById(post.author);
+    const commentAuthorUser = await UserModel.findById(author);
+
+    if (Expo.isExpoPushToken(postAuthorUser.expoPushToken)) {
+        try {
+            const { firstName, lastName } = commentAuthorUser;
+            const title = `${firstName} ${lastName} comentó en tu publicación`;
+
+            await expo.sendPushNotificationsAsync([{
+                _displayInForeground: true,
+                to: postAuthorUser.expoPushToken,
+                sound: 'default',
+                title,
+                body,
+                data: {
+                    title,
+                    body,
+                    postId: post._id,
+                    commentId: newComment._id,
+                },
+            }]);
+        } catch (error) {
+            winston.log('error', error);
+        }
+    }
+};
+
 module.exports = {
     registerToken,
     sendNewPostNotification,
+    sendNewCommentNotification,
 };
