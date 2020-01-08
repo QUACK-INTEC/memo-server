@@ -3,8 +3,10 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const winston = require('winston');
 const cors = require('cors');
+const cron = require('node-cron');
 
 const MemoError = require('./constants/errors/MemoError');
+const cleanUpAttachments = require('./utils/cleanUpAttachements');
 
 const passportConfig = require('./config/passport');
 
@@ -39,5 +41,11 @@ const SERVER_PORT = process.env.PORT || 3000;
 app.listen(SERVER_PORT, () => {
     winston.log('info', `🚀 Server running on port ${SERVER_PORT}.`);
 });
+
+cleanUpAttachments();
+// cron.schedule('55 19 * * 1', () => {
+//     cleanUpAttachments();
+// });
+
 
 module.exports = app;
