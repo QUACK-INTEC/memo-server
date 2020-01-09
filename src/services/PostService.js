@@ -9,7 +9,6 @@ const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
         .populate({ path: 'comments.reactions.author', model: 'user' })
-        .populate({ path: 'comments.author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
         .populate('attachments')
         .populate({
@@ -114,15 +113,23 @@ const resetVoteComment = async (id, userId) => {
     comment.reactions.forEach((r) => {
         if (String(r.author) !== String(userId)) {
             reactions.push(r);
-            valueOfPreviousReaction = r.value;
+        } else {
+            valueOfPreviousReaction = r.value; // This was my reaction
         }
     });
 
+    // Reseting
+    // My reaction before was positive, then remove 1 point from author
     if (valueOfPreviousReaction > 0) {
-        await UserService.awardPoints(comment.author.id, 5); // points author
-        await UserService.awardPoints(userId, 5); // points reactioner
+        await UserService.awardPoints(comment.author.id, -1); // points author
+
+        // Before I was give points, then, take then from me.
+        await UserService.awardPoints(userId, -5); // points reactioner
     } else if (valueOfPreviousReaction < 0) {
-        await UserService.awardPoints(comment.author.id, -5); // points reactioner
+        // My reaction before was negative, then add 1 point, because before we rested 1.
+        await UserService.awardPoints(comment.author.id, 1); // points author
+
+        // Before I was give points, then, take then from me.
         await UserService.awardPoints(userId, -5); // points reactioner
     }
 
@@ -155,12 +162,12 @@ const changeVoteComment = async (id, userId, value) => {
         .exec();
     const comment = post.comments.id(id);
 
-    if (value > 0) {
-        await UserService.awardPoints(comment.author.id, 5); // points author
+    if (value > 0) { // Reaction was positive
+        await UserService.awardPoints(comment.author.id, 1); // points author
         await UserService.awardPoints(userId, 5); // points reactioner
-    } else if (value < 0) {
-        await UserService.awardPoints(comment.author.id, -5); // points reactioner
-        await UserService.awardPoints(userId, -5); // points reactioner
+    } else if (value < 0) { // Reaction was negative
+        await UserService.awardPoints(comment.author.id, -1); // points reactioner
+        await UserService.awardPoints(userId, 5); // points reactioner
     }
     return result;
 };
@@ -218,7 +225,8 @@ const addComment = async (postId, userId, body) => {
         throw new NotFoundError('Publicacion no encontrada');
     }
 
-    UserService.awardPoints(userId, 5);
+    UserService.awardPoints(userId, 10); // Comment creator
+    UserService.awardPoints(post.author, 1); // Post creator
 
     return comment;
 };
