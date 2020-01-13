@@ -17,6 +17,12 @@ const registerToken = async (userId, expoPushToken) => {
     ).lean().exec();
 };
 
+const unregisterToken = async (userId) => {
+    await UserModel.findByIdAndUpdate(
+        userId, { expoPushToken: null },
+    ).lean().exec();
+};
+
 const sendNewPostNotification = async (newPost) => {
     const section = await SectionModel.findById(newPost.section).populate('students');
 
@@ -55,5 +61,6 @@ const sendNewPostNotification = async (newPost) => {
 
 module.exports = {
     registerToken,
+    unregisterToken,
     sendNewPostNotification,
 };
