@@ -33,7 +33,7 @@ const uploadProfile = multer({
             cb(null, { uploadedBy: req.user.id.toString() });
         },
         key: (req, file, cb) => {
-            cb(null, `memo/profile/${req.user.id}`);
+            cb(null, `memo/profile/${req.user.id}/${Date.now().toString()}`);
         },
     }),
 }).single('file');

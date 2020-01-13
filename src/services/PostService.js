@@ -78,7 +78,6 @@ const resetVote = async (id, userId) => {
     return result;
 };
 
-
 const changeVote = async (id, userId, value) => {
     await resetVote(id, userId);
     const result = PostModel.update(
@@ -140,7 +139,6 @@ const resetVoteComment = async (id, userId) => {
     return result;
 };
 
-
 const changeVoteComment = async (id, userId, value) => {
     await resetVoteComment(id, userId);
     const reaction = {
@@ -176,7 +174,6 @@ const upVoteComment = async (id, userId) => changeVoteComment(id, userId, 1);
 const downVoteComment = async (id, userId) => changeVoteComment(id, userId, -1);
 
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
-
 
 const addSubtask = async (data) => new SubTaskModel(data).save();
 
@@ -227,6 +224,9 @@ const addComment = async (postId, userId, body) => {
 
     UserService.awardPoints(userId, 10); // Comment creator
     UserService.awardPoints(post.author, 1); // Post creator
+    if (post.isPublic && post.author._id.toString() !== userId.toString()) {
+        await NotificationService.sendNewCommentNotification(post, comment);
+    }
 
     return comment;
 };
