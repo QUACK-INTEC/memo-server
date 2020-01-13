@@ -25,6 +25,10 @@ const sync = async (req, res) => {
     const universityModel = await UniversityService.findByName(university);
 
     const { schedule, discriminator } = uniData;
+
+    await UniversityService.updateDiscriminator(universityModel._id, discriminator);
+    await UserService.updateSyncStatus(req.user.id, universityModel._id, discriminator, new Date());
+
     const sectionsPromises = schedule.map(async (sectionData) => {
         const subject = await SubjectService.updateOrCreate(
             universityModel._id,
@@ -47,9 +51,6 @@ const sync = async (req, res) => {
     });
 
     const sections = await Promise.all(sectionsPromises);
-
-    await UniversityService.updateDiscriminator(universityModel._id, discriminator);
-    await UserService.updateSyncStatus(req.user.id, universityModel._id, discriminator, new Date());
 
     res.json({ sections: sections.map(serializeSection) });
 };
