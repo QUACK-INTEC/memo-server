@@ -42,10 +42,12 @@ app.listen(SERVER_PORT, () => {
     winston.log('info', `🚀 Server running on port ${SERVER_PORT}.`);
 });
 
-cleanUpAttachments();
-// cron.schedule('55 19 * * 1', () => {
-//     cleanUpAttachments();
-// });
+// Uncomment to test
+// cleanUpAttachments();
+
+cron.schedule('55 19 * * 1', () => {
+    cleanUpAttachments();
+});
 
 
 module.exports = app;
