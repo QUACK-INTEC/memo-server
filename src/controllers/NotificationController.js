@@ -14,7 +14,13 @@ const registerToken = async (req, res) => {
     res.json({ success: true });
 };
 
+const unregisterToken = async (req, res) => {
+    await NotificationService.unregisterToken(req.user.id);
+    res.json({ success: true });
+};
+
 
 module.exports = {
     registerToken,
+    unregisterToken,
 };
