@@ -43,7 +43,7 @@ const sendNewPostNotification = async (newPost) => {
         const body = `${section.subject.name}: ${newPost.title}`;
 
         await expo.sendPushNotificationsAsync([{
-            _displayInForeground: true,
+//             _displayInForeground: true,
             to: recipients,
             sound: 'default',
             title,
@@ -70,7 +70,7 @@ const sendNewCommentNotification = async (post, newComment) => {
             const title = `${firstName} ${lastName} comentó en tu publicación`;
 
             await expo.sendPushNotificationsAsync([{
-                _displayInForeground: true,
+//                 _displayInForeground: true,
                 to: postAuthorUser.expoPushToken,
                 sound: 'default',
                 title,
