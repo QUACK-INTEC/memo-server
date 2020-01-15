@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { UserModel, RankModel, UniversityModel } = require('../models');
 
 const { EMAIL_ADDRESS, EMAIL_PASSWORD } = require('../config/config');
+const { otpEmailTemplate, welcomeEmailTemplate } = require('../utils/emailTemplates');
 
 const NotFoundError = require('../constants/errors/NotFoundError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
@@ -15,7 +16,26 @@ const create = async (userInfo) => {
         data.rank = defaultRank._id;
     }
     try {
-        return await new UserModel(data).save();
+        const newUser = await new UserModel(data).save();
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: EMAIL_ADDRESS,
+                pass: EMAIL_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: EMAIL_ADDRESS,
+            to: data.email,
+            subject: 'Bienvenido a Memo',
+            html: welcomeEmailTemplate(),
+        };
+
+        transporter.sendMail(mailOptions);
+
+        return newUser;
     } catch (err) {
         if (err.name === 'MongoError' && err.code === 11000) {
             throw new InvalidFieldError('El usuario ya existe!');
@@ -65,6 +85,7 @@ const sendForgotPasswordEmail = async (email) => {
         to: email,
         subject: 'Memo: Recuperar contraseña',
         text: `Su contraseña de uso único y 24 horas de validez es: ${tempCode}`,
+        html: otpEmailTemplate(tempCode),
     };
 
     const result = await transporter.sendMail(mailOptions);
