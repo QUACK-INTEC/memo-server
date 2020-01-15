@@ -4,6 +4,13 @@ const NotificationService = require('./NotificationService');
 const UserService = require('./UserService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
+const {
+    POINTS_COMMENT_TO_COMMENT_CREATOR,
+    POINTS_COMMENT_TO_POST_CREATOR,
+    POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR,
+    POINTS_COMMENT_REACTION_TO_REACTION_CREATOR,
+} = require('../constants/points');
+
 
 const findById = async (id, userId) => {
     const result = await PostModel
@@ -161,11 +168,17 @@ const changeVoteComment = async (id, userId, value) => {
     const comment = post.comments.id(id);
 
     if (value > 0) { // Reaction was positive
-        await UserService.awardPoints(comment.author.id, 1); // points author
-        await UserService.awardPoints(userId, 5); // points reactioner
+        await UserService.awardPoints(
+            comment.author.id,
+            POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR,
+        );
+        await UserService.awardPoints(userId, POINTS_COMMENT_REACTION_TO_REACTION_CREATOR);
     } else if (value < 0) { // Reaction was negative
-        await UserService.awardPoints(comment.author.id, -1); // points reactioner
-        await UserService.awardPoints(userId, 5); // points reactioner
+        await UserService.awardPoints(
+            comment.author.id,
+            POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR * -1,
+        );
+        await UserService.awardPoints(userId, POINTS_COMMENT_REACTION_TO_REACTION_CREATOR);
     }
     return result;
 };
@@ -222,8 +235,8 @@ const addComment = async (postId, userId, body) => {
         throw new NotFoundError('Publicacion no encontrada');
     }
 
-    UserService.awardPoints(userId, 10); // Comment creator
-    UserService.awardPoints(post.author, 1); // Post creator
+    await UserService.awardPoints(userId, POINTS_COMMENT_TO_COMMENT_CREATOR); // Comment creator
+    await UserService.awardPoints(post.author, POINTS_COMMENT_TO_POST_CREATOR); // Post creator
     if (post.isPublic && post.author._id.toString() !== userId.toString()) {
         await NotificationService.sendNewCommentNotification(post, comment);
     }
@@ -256,7 +269,8 @@ const deleteComment = async (postId, authorId, commentId) => {
         },
     });
 
-    UserService.awardPoints(authorId, -5);
+    await UserService.awardPoints(authorId, POINTS_COMMENT_TO_COMMENT_CREATOR * -1);
+    await UserService.awardPoints(post.author.id, POINTS_COMMENT_TO_POST_CREATOR * -1);
 
     return !!(updateRes.ok && updateRes.nModified);
 };
