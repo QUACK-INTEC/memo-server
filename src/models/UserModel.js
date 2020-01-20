@@ -24,6 +24,14 @@ const UserModel = new Schema({
         type: String,
         required: true,
     },
+    otp: {
+        type: String,
+        required: false,
+    },
+    otpExpiration: {
+        type: Date,
+        required: false,
+    },
     avatarURL: {
         type: String,
     },
@@ -31,16 +39,25 @@ const UserModel = new Schema({
         type: Number,
         default: 0,
     },
-    lastSync: {
-        type: Date,
-    },
-    sections: [{
+    rank: {
         type: ObjectId,
-        required: false,
-        ref: 'section',
+        ref: 'rank',
+        autopopulate: true,
+    },
+    syncStatus: [{
+        university: {
+            type: ObjectId,
+            ref: 'university',
+            required: true,
+        },
+        syncDate: Date,
+        discriminator: String,
     }],
+    expoPushToken: String,
 }, {
     timestamps: true,
 });
+
+UserModel.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model('user', UserModel);

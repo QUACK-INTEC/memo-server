@@ -1,38 +1,52 @@
 const mongoose = require('mongoose');
 const { PostModel, SubTaskModel } = require('../models');
+const NotificationService = require('./NotificationService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 
 const findById = async (id, userId) => {
     const result = await PostModel
         .findById(id)
-        .populate({ path: 'comments.author', model: 'user' })
         .populate({ path: 'comments.reactions.author', model: 'user' })
         .populate({ path: 'reactions.author', model: 'user' })
-        .populate('author')
         .populate('attachments')
         .populate({
             path: 'subtasks',
             match: { author: userId },
         })
+        .lean({ virtuals: true, autopopulate: true })
         .exec();
     if (!result) {
         throw new NotFoundError('Post no encontrado');
     }
-    result.currentUserReaction = result.reactions.find((r) => String(r.author && r.author._id) === String(userId));
+    result.currentUserReaction = result.reactions.find(
+        (r) => String(r.author && r.author._id) === String(userId),
+    );
 
-    result.comments = result.comments.map((comment) => ({
-        ...comment,
-        currentUserReaction:
+    const comments = result.comments.map((comment) => {
+        const newComment = {
+            ...comment,
+            currentUserReaction:
             comment.reactions.find((r) => String(r.author._id) === String(userId)),
-    }));
-    return result;
+        };
+        return newComment;
+    });
+    return {
+        ...result,
+        comments,
+    };
 };
 
 const create = async (data) => {
     const result = await new PostModel(data).save();
+
+    if (result.isPublic) {
+        await NotificationService.sendNewPostNotification(result);
+    }
+
     return result;
 };
+
 
 const update = async (postData) => {
     const { id } = postData;
@@ -63,7 +77,6 @@ const resetVote = async (id, userId) => {
     return result;
 };
 
-
 const changeVote = async (id, userId, value) => {
     await resetVote(id, userId);
     const result = PostModel.update(
@@ -82,6 +95,46 @@ const changeVote = async (id, userId, value) => {
 
 const upVote = async (id, userId) => changeVote(id, userId, 1);
 const downVote = async (id, userId) => changeVote(id, userId, -1);
+
+const resetVoteComment = async (id, userId) => {
+    const post = await PostModel.findOne(
+        {
+            'comments._id': id,
+        },
+    )
+        .exec();
+    const comment = post.comments.id(id);
+    const reactions = [];
+    comment.reactions.forEach((r) => {
+        if (String(r.author) !== String(userId)) {
+            reactions.push(r);
+        }
+    });
+
+    const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
+        $set:
+        { 'comments.$.reactions': reactions },
+    }, { upsert: true });
+    return result;
+};
+
+const changeVoteComment = async (id, userId, value) => {
+    await resetVoteComment(id, userId);
+    const reaction = {
+        author: userId,
+        value,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+    };
+    const result = await PostModel.update({ 'comments._id': id }, {
+        $push:
+        { 'comments.$.reactions': reaction },
+    });
+    return result;
+};
+
+const upVoteComment = async (id, userId) => changeVoteComment(id, userId, 1);
+const downVoteComment = async (id, userId) => changeVoteComment(id, userId, -1);
 
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
 
@@ -132,6 +185,10 @@ const addComment = async (postId, userId, body) => {
         throw new NotFoundError('Publicacion no encontrada');
     }
 
+    if (post.isPublic && post.author._id.toString() !== userId.toString()) {
+        await NotificationService.sendNewCommentNotification(post, comment);
+    }
+
     return comment;
 };
 
@@ -148,7 +205,7 @@ const deleteComment = async (postId, authorId, commentId) => {
         throw new NotFoundError('Comentario no encontrado');
     }
 
-    if (comment.author.toString() !== authorId.toString()) {
+    if (comment.author._id.toString() !== authorId.toString()) {
         throw new ForbiddenError('Este comentario no le pertenece!');
     }
 
@@ -174,6 +231,9 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    upVoteComment,
+    downVoteComment,
+    resetVoteComment,
     addComment,
     deleteComment,
 };

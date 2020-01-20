@@ -1,11 +1,14 @@
 
 const SectionService = require('../services/SectionService');
 const PostService = require('../services/PostService');
+const UserService = require('../services/UserService');
 const { serializePost, serializeTask, serializeComment } = require('../utils/serializers');
 
 const ForbiddenError = require('../constants/errors/ForbiddenError');
 const InvalidFieldError = require('../constants/errors/InvalidFieldError');
 const MissingFieldError = require('../constants/errors/MissingFieldError');
+
+const { POINTS_PER_POST } = require('../constants/points');
 
 const create = async (req, res) => {
     const {
@@ -18,6 +21,11 @@ const create = async (req, res) => {
         attachments,
         isPublic,
     } = req.body;
+
+    if (!title || !type || isPublic === undefined || !section) {
+        throw new MissingFieldError('Campos faltantes');
+    }
+
     if ((type === 'Event' && !endDate)) {
         throw new MissingFieldError('Fecha de finalización es requerida');
     }
@@ -39,6 +47,9 @@ const create = async (req, res) => {
         isPublic,
         author: req.user.id,
     });
+
+    await UserService.awardPoints(post.author, POINTS_PER_POST);
+
     res.json({
         success: true,
         data: serializePost(post),
@@ -57,6 +68,10 @@ const update = async (req, res) => {
         attachments,
         isPublic,
     } = req.body;
+
+    if (!title || !type || isPublic === undefined || !section) {
+        throw new MissingFieldError('Campos faltantes');
+    }
 
     if (type === 'Event' && !(new Date(endDate)).getDate()) {
         throw new InvalidFieldError('Fecha de finalización no es válida');
@@ -103,6 +118,8 @@ const deletePost = async (req, res) => {
     }
 
     const result = await PostService.deletePost(id);
+    await UserService.awardPoints(post.author, -POINTS_PER_POST);
+
     const success = result.ok > 0 && result.n > 0;
     res.json({
         success,
@@ -131,6 +148,33 @@ const resetVote = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
     const result = await PostService.resetVote(id, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const upVoteComment = async (req, res) => {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.upVoteComment(commentId, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const downVoteComment = async (req, res) => {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.downVoteComment(commentId, userId);
+    res.json({
+        success: result.ok > 0 && result.n > 0,
+    });
+};
+
+const resetVoteComment = async (req, res) => {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const result = await PostService.resetVoteComment(commentId, userId);
     res.json({
         success: result.ok > 0 && result.n > 0,
     });
@@ -218,6 +262,9 @@ module.exports = {
     upVote,
     downVote,
     resetVote,
+    upVoteComment,
+    downVoteComment,
+    resetVoteComment,
     addComment,
     deleteComment,
 };

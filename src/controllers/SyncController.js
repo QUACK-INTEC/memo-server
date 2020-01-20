@@ -1,6 +1,7 @@
 const UniHook = require('../unihook');
 
 const UniversityService = require('../services/UniversityService');
+const UserService = require('../services/UserService');
 const SubjectService = require('../services/SubjectService');
 const SectionService = require('../services/SectionService');
 
@@ -24,13 +25,18 @@ const sync = async (req, res) => {
     const universityModel = await UniversityService.findByName(university);
 
     const { schedule, discriminator } = uniData;
+
+    await UniversityService.updateDiscriminator(universityModel._id, discriminator);
+    await UserService.updateSyncStatus(req.user.id, universityModel._id, discriminator, new Date());
+
     const sectionsPromises = schedule.map(async (sectionData) => {
-        const subject = await SubjectService.findOrCreate(
+        const subject = await SubjectService.updateOrCreate(
             universityModel._id,
             sectionData.code,
             sectionData.name,
         );
         const section = await SectionService.updateOrCreate({
+            active: true,
             code: sectionData.section,
             subject: subject._id,
             professorName: sectionData.professor,
@@ -54,7 +60,12 @@ const getUniversities = async (req, res) => {
     res.json({ universities: universities.map(serializeUniversity) });
 };
 
+const checkRequired = async (req, res) => {
+    res.json({ syncRequired: await UserService.checkSyncRequired(req.user.id) });
+};
+
 module.exports = {
     sync,
     getUniversities,
+    checkRequired,
 };
