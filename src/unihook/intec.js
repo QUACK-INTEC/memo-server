@@ -9,8 +9,20 @@ const InvalidFieldError = require('../constants/errors/InvalidFieldError');
 axiosCookieJarSupport(axios);
 
 const BASE_URL = 'https://procesos.intec.edu.do';
-const DISCRIM_ROUTE = 'OfertaAcademica/Index';
+const SCHEDULE_ROUTE = '/Reporte/MostrarEnPantalla';
 const DAY_NAMES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+const getPeriodNum = (nowDate) => {
+    const evalMonth = nowDate.getUTCMonth() === 0 ? 12 : nowDate.getUTCMonth();
+    const evalPeriod = Math.ceil(evalMonth / 3);
+    const getYear = nowDate.getFullYear();
+    const evalYear = evalPeriod === 4 ? getYear - 1 : getYear;
+
+    return {
+        period: evalPeriod,
+        year: evalYear,
+    };
+};
 
 const formatTitle = (str) => {
     const alwaysUp = ['i', 'ii', 'iii', 'iv'];
@@ -36,42 +48,41 @@ const parseSchedule = (html) => {
     const $ = cheerio.load(html);
     const classes = [];
 
-    $('#tblActuales tbody tr').each((_idx, el) => {
+    $('table.print-table tbody tr').each((_idx, el) => {
         const row = $(el);
 
-        const schedule = {};
+        // ignore rows that dont contain schedule info
+        if (row.children().length === 12) {
+            const schedule = {};
 
-        row.children(':nth-child(n+5):nth-child(-n+10)').each((i, dayEl) => {
-            const split = $(dayEl).text().split('/');
-            if (split.length === 2) {
-                schedule[DAY_NAMES[i]] = {
-                    from: parseInt(split[0], 10),
-                    to: parseInt(split[1], 10),
-                };
-            }
-        });
+            row.children(':nth-child(n+6):nth-child(-n+11)').each((i, dayEl) => {
+                const split = $(dayEl).text().split('/');
+                if (split.length === 2) {
+                    schedule[DAY_NAMES[i]] = {
+                        from: parseInt(split[0], 10),
+                        to: parseInt(split[1], 10),
+                    };
+                }
+            });
 
-        const sectionInfo = {
-            code: row.children().first().text().replace(/ +(?= )/g, ''),
-            section: row.children(':nth-child(3)').text().replace(/ +(?= )/g, ''),
-            room: row.children(':nth-child(4)').text().replace(/ +(?= )/g, ''),
-            name: formatTitle(row.children(':nth-child(2)').text()),
-            professor: formatTitle(row.children(':nth-child(12)').text().replace(/ +(?= )/g, '')),
-            schedule,
-        };
+            const sectionInfo = {
+                code: row.children().first().text().replace(/ +(?= )/g, ''),
+                section: row.children(':nth-child(2)').text().replace(/ +(?= )/g, ''),
+                room: row.children(':nth-child(12)').text().replace(/ +(?= )/g, ''),
+                name: formatTitle(row.children(':nth-child(3)').text()),
+                professor: formatTitle(row.children(':nth-child(4)').text().replace(/ +(?= )/g, '')),
+                schedule,
+            };
 
-        classes.push(sectionInfo);
+            classes.push(sectionInfo);
+        }
     });
 
 
     return classes;
 };
 
-const parseDiscrim = (html) => {
-    const $ = cheerio.load(html);
-    const DISCRIM_STRIP_PREFIX = 'Oferta Académica para el trimestre ';
-    return $('.content-header .section-title').text().substring(DISCRIM_STRIP_PREFIX.length);
-};
+const computeDiscrim = (periodInfo) => `${periodInfo.period}/${periodInfo.year}`;
 
 const scrapeSchedule = async (username, password) => {
     const cookieJar = new tough.CookieJar();
@@ -88,10 +99,18 @@ const scrapeSchedule = async (username, password) => {
     });
 
     if (res.request.path === '/Main/Inicio') {
-        const discrimRes = await intec.get(DISCRIM_ROUTE);
-        const discriminator = parseDiscrim(discrimRes.data);
+        const periodInfo = getPeriodNum(new Date());
+        const discriminator = computeDiscrim(periodInfo);
 
-        const schedule = parseSchedule(res.data);
+        const scheduleRes = await intec.post(SCHEDULE_ROUTE, {
+            indiceReporte: '3',
+            parametros: {
+                Ano: periodInfo.year.toString(),
+                Termino: periodInfo.period.toString(),
+            },
+        });
+
+        const schedule = parseSchedule(scheduleRes.data);
 
         return { schedule, discriminator };
     }
@@ -101,6 +120,6 @@ const scrapeSchedule = async (username, password) => {
 
 module.exports = {
     parseSchedule,
-    parseDiscrim,
     scrapeSchedule,
+    getPeriodNum,
 };

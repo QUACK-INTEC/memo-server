@@ -1,13 +1,13 @@
 const chai = require('chai');
-const { parseSchedule, parseDiscrim } = require('../../src/unihook/intec');
-const { RES_EXAMPLE_SCHEDULE, RES_EXAMPLE_DISCRIM } = require('./intec.templates');
+const { parseSchedule } = require('../../src/unihook/intec');
+const { RES_EXAMPLE } = require('./intec.templates');
 
 chai.should();
 
 describe('UniHook - INTEC', () => {
     describe('Schedule Parser', () => {
         it('should parse the main page html correctly', () => {
-            const classes = parseSchedule(RES_EXAMPLE_SCHEDULE);
+            const classes = parseSchedule(RES_EXAMPLE);
 
             classes.should.be.an('array').with.lengthOf(3);
 
@@ -25,15 +25,8 @@ describe('UniHook - INTEC', () => {
         });
 
         it('should strip extra spaces from professor name', () => {
-            const classes = parseSchedule(RES_EXAMPLE_SCHEDULE);
+            const classes = parseSchedule(RES_EXAMPLE);
             classes[2].should.have.property('professor', 'David Alejandro Joa Morales');
-        });
-    });
-
-    describe('Discriminator Parser', () => {
-        it('should parse the discriminator from html correctly', () => {
-            const discrim = parseDiscrim(RES_EXAMPLE_DISCRIM);
-            discrim.should.equal('NOVIEMBRE 2019 - ENERO 2020');
         });
     });
 });
