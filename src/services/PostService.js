@@ -127,16 +127,20 @@ const resetVoteComment = async (id, userId) => {
     // Reseting
     // My reaction before was positive, then remove 1 point from author
     if (valueOfPreviousReaction > 0) {
-        await UserService.awardPoints(comment.author.id, -1); // points author
+        await UserService.awardPoints(comment.author.id,
+            -1 * POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points author
 
         // Before I was give points, then, take then from me.
-        await UserService.awardPoints(userId, -5); // points reactioner
+        await UserService.awardPoints(userId,
+            -1 * POINTS_COMMENT_REACTION_TO_REACTION_CREATOR); // points reactioner
     } else if (valueOfPreviousReaction < 0) {
         // My reaction before was negative, then add 1 point, because before we rested 1.
-        await UserService.awardPoints(comment.author.id, 1); // points author
+        await UserService.awardPoints(comment.author.id,
+            POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points author
 
         // Before I was give points, then, take then from me.
-        await UserService.awardPoints(userId, -5); // points reactioner
+        await UserService.awardPoints(userId,
+            -1 * POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points reactioner
     }
 
     const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
