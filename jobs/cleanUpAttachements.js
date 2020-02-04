@@ -4,6 +4,8 @@ const { AWS_S3_BUCKET_NAME, AWS_S3_ENDPOINT } = require('../src/config/config');
 const { PostModel, AttachmentModel } = require('../src/models');
 const { S3_ATTACHMENTS_PREFIX } = require('../src/constants/aws');
 
+require('../src/database');
+
 const s3 = new aws.S3({
     endpoint: new aws.Endpoint(AWS_S3_ENDPOINT),
 });
