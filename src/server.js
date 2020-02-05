@@ -40,4 +40,5 @@ app.listen(SERVER_PORT, () => {
     winston.log('info', `🚀 Server running on port ${SERVER_PORT}.`);
 });
 
+
 module.exports = app;
