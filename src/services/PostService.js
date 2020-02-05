@@ -1,8 +1,16 @@
 const mongoose = require('mongoose');
 const { PostModel, SubTaskModel } = require('../models');
 const NotificationService = require('./NotificationService');
+const UserService = require('./UserService');
 const NotFoundError = require('../constants/errors/NotFoundError');
 const ForbiddenError = require('../constants/errors/ForbiddenError');
+const {
+    POINTS_COMMENT_TO_COMMENT_CREATOR,
+    POINTS_COMMENT_TO_POST_CREATOR,
+    POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR,
+    POINTS_COMMENT_REACTION_TO_REACTION_CREATOR,
+} = require('../constants/points');
+
 
 const findById = async (id, userId) => {
     const result = await PostModel
@@ -104,12 +112,36 @@ const resetVoteComment = async (id, userId) => {
     )
         .exec();
     const comment = post.comments.id(id);
+
+    let valueOfPreviousReaction = 0;
+
     const reactions = [];
     comment.reactions.forEach((r) => {
         if (String(r.author) !== String(userId)) {
             reactions.push(r);
+        } else {
+            valueOfPreviousReaction = r.value; // This was my reaction
         }
     });
+
+    // Reseting
+    // My reaction before was positive, then remove 1 point from author
+    if (valueOfPreviousReaction > 0) {
+        await UserService.awardPoints(comment.author.id,
+            -1 * POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points author
+
+        // Before I was give points, then, take then from me.
+        await UserService.awardPoints(userId,
+            -1 * POINTS_COMMENT_REACTION_TO_REACTION_CREATOR); // points reactioner
+    } else if (valueOfPreviousReaction < 0) {
+        // My reaction before was negative, then add 1 point, because before we rested 1.
+        await UserService.awardPoints(comment.author.id,
+            POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points author
+
+        // Before I was give points, then, take then from me.
+        await UserService.awardPoints(userId,
+            -1 * POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points reactioner
+    }
 
     const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
         $set:
@@ -130,6 +162,28 @@ const changeVoteComment = async (id, userId, value) => {
         $push:
         { 'comments.$.reactions': reaction },
     });
+
+    const post = await PostModel.findOne(
+        {
+            'comments._id': id,
+        },
+    )
+        .exec();
+    const comment = post.comments.id(id);
+
+    if (value > 0) { // Reaction was positive
+        await UserService.awardPoints(
+            comment.author.id,
+            POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR,
+        );
+        await UserService.awardPoints(userId, POINTS_COMMENT_REACTION_TO_REACTION_CREATOR);
+    } else if (value < 0) { // Reaction was negative
+        await UserService.awardPoints(
+            comment.author.id,
+            POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR * -1,
+        );
+        await UserService.awardPoints(userId, POINTS_COMMENT_REACTION_TO_REACTION_CREATOR);
+    }
     return result;
 };
 
@@ -185,6 +239,8 @@ const addComment = async (postId, userId, body) => {
         throw new NotFoundError('Publicacion no encontrada');
     }
 
+    await UserService.awardPoints(userId, POINTS_COMMENT_TO_COMMENT_CREATOR); // Comment creator
+    await UserService.awardPoints(post.author, POINTS_COMMENT_TO_POST_CREATOR); // Post creator
     if (post.isPublic && post.author._id.toString() !== userId.toString()) {
         await NotificationService.sendNewCommentNotification(post, comment);
     }
@@ -216,6 +272,9 @@ const deleteComment = async (postId, authorId, commentId) => {
             },
         },
     });
+
+    await UserService.awardPoints(authorId, POINTS_COMMENT_TO_COMMENT_CREATOR * -1);
+    await UserService.awardPoints(post.author.id, POINTS_COMMENT_TO_POST_CREATOR * -1);
 
     return !!(updateRes.ok && updateRes.nModified);
 };
