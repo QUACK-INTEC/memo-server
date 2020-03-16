@@ -1,11 +1,8 @@
 const aws = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const winston = require('winston');
 
 const { AWS_S3_BUCKET_NAME, AWS_S3_ENDPOINT } = require('../config/config');
-
-const InvalidFieldError = require('../constants/errors/InvalidFieldError');
 
 const s3 = new aws.S3({
     endpoint: new aws.Endpoint(AWS_S3_ENDPOINT),
@@ -36,18 +33,9 @@ const uploadProfile = multer({
             cb(null, { uploadedBy: req.user.id.toString() });
         },
         key: (req, file, cb) => {
-            cb(null, `memo/profile/${req.user.id}`);
+            cb(null, `memo/profile/${req.user.id}/${Date.now().toString()}`);
         },
     }),
-//     fileFilter: (req, file, cb) => {
-//         winston.log('info', `filename: ${file.originalname}`);
-//         if (!file.originalname || !file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-            
-//             cb(new InvalidFieldError('Solo puede subir archivos de imagen como foto de perfil'));
-//         } else {
-//             cb(null, true);
-//         }
-//     },
 }).single('file');
 
 module.exports = {

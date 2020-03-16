@@ -48,7 +48,7 @@ const login = async (req, res) => {
         throw new MissingFieldError('Faltan campos requeridos');
     }
 
-    const user = await UserService.findOne({ email });
+    const user = await UserService.findOne({ email: email.toLowerCase() });
     if (!user) {
         throw new UnauthorizedError('Usuario no encontrado');
     }

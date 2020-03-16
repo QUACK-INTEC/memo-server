@@ -17,6 +17,12 @@ const registerToken = async (userId, expoPushToken) => {
     ).lean().exec();
 };
 
+const unregisterToken = async (userId) => {
+    await UserModel.findByIdAndUpdate(
+        userId, { expoPushToken: null },
+    ).lean().exec();
+};
+
 const sendNewPostNotification = async (newPost) => {
     const section = await SectionModel.findById(newPost.section).populate('students');
 
@@ -33,12 +39,17 @@ const sendNewPostNotification = async (newPost) => {
     }
 
     try {
+        const title = 'Nueva publicación creada';
+        const body = `${section.subject.name}: ${newPost.title}`;
+
         await expo.sendPushNotificationsAsync([{
             to: recipients,
             sound: 'default',
-            title: 'Nueva publicación creada',
-            body: `${section.subject.name}: ${newPost.title}`,
+            title,
+            body,
             data: {
+                title,
+                body,
                 postId: newPost._id,
             },
         }]);
@@ -47,7 +58,37 @@ const sendNewPostNotification = async (newPost) => {
     }
 };
 
+const sendNewCommentNotification = async (post, newComment) => {
+    const { body, author } = newComment;
+    const postAuthorUser = await UserModel.findById(post.author);
+    const commentAuthorUser = await UserModel.findById(author);
+
+    if (Expo.isExpoPushToken(postAuthorUser.expoPushToken)) {
+        try {
+            const { firstName, lastName } = commentAuthorUser;
+            const title = `${firstName} ${lastName} comentó en tu publicación`;
+
+            await expo.sendPushNotificationsAsync([{
+                to: postAuthorUser.expoPushToken,
+                sound: 'default',
+                title,
+                body,
+                data: {
+                    title,
+                    body,
+                    postId: post._id,
+                    commentId: newComment._id,
+                },
+            }]);
+        } catch (error) {
+            winston.log('error', error);
+        }
+    }
+};
+
 module.exports = {
     registerToken,
+    unregisterToken,
     sendNewPostNotification,
+    sendNewCommentNotification,
 };
