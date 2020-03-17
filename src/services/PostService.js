@@ -140,7 +140,7 @@ const resetVoteComment = async (id, userId) => {
 
         // Before I was give points, then, take then from me.
         await UserService.awardPoints(userId,
-            -1 * POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points reactioner
+            -1 * POINTS_COMMENT_REACTION_TO_REACTION_CREATOR); // points reactioner
     }
 
     const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
