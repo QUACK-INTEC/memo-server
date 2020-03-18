@@ -136,7 +136,7 @@ const changeVote = async (id, userId, value) => {
 
     const post = await PostModel.findOne(
         {
-            '_id': id,
+            _id: id,
         },
     ).exec();
 
