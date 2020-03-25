@@ -9,6 +9,8 @@ const {
     POINTS_COMMENT_TO_POST_CREATOR,
     POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR,
     POINTS_COMMENT_REACTION_TO_REACTION_CREATOR,
+    POINTS_POST_REACTION_TO_POST_CREATOR,
+    POINTS_POST_REACTION_TO_REACTION_CREATOR,
 } = require('../constants/points');
 
 
@@ -69,11 +71,43 @@ const update = async (postData) => {
 const resetVote = async (id, userId) => {
     const post = await PostModel
         .findById(id)
+        .populate({ path: 'reactions.author', model: 'user' })
         .exec();
     if (!post) {
         throw new NotFoundError('Post no encontrado');
     }
-    const result = PostModel.update(
+
+    let valueOfPreviousReaction = 0;
+    const reactions = [];
+    post.reactions.forEach((r) => {
+        if (String(r.author._id) !== String(userId)) {
+            reactions.push(r);
+        } else {
+            valueOfPreviousReaction = r.value; // This was my reaction
+        }
+    });
+
+
+    // Reseting
+    // My reaction before was positive, then remove 1 point from author
+    if (valueOfPreviousReaction > 0) {
+        await UserService.awardPoints(post.author.id,
+            -1 * POINTS_POST_REACTION_TO_POST_CREATOR); // points author
+
+        // Before I was give points, then, take then from me.
+        await UserService.awardPoints(userId,
+            -1 * POINTS_POST_REACTION_TO_REACTION_CREATOR); // points reactioner
+    } else if (valueOfPreviousReaction < 0) {
+        // My reaction before was negative, then add 1 point, because before we rested 1.
+        await UserService.awardPoints(post.author.id,
+            POINTS_POST_REACTION_TO_POST_CREATOR); // points author
+
+        // Before I was give points, then, take then from me.
+        await UserService.awardPoints(userId,
+            -1 * POINTS_POST_REACTION_TO_REACTION_CREATOR); // points reactioner
+    }
+
+    const result = await PostModel.update(
         { _id: id },
         {
             $pull: {
@@ -83,6 +117,7 @@ const resetVote = async (id, userId) => {
             },
         },
     ).lean().exec();
+
     return result;
 };
 
@@ -99,10 +134,31 @@ const changeVote = async (id, userId, value) => {
             },
         },
     ).lean().exec();
+
+    const post = await PostModel.findOne(
+        {
+            _id: id,
+        },
+    ).exec();
+
+    if (value > 0) { // Reaction was positive
+        await UserService.awardPoints(
+            post.author.id,
+            POINTS_POST_REACTION_TO_POST_CREATOR,
+        );
+        await UserService.awardPoints(userId, POINTS_POST_REACTION_TO_REACTION_CREATOR);
+    } else if (value < 0) { // Reaction was negative
+        await UserService.awardPoints(
+            post.author.id,
+            POINTS_POST_REACTION_TO_POST_CREATOR * -1,
+        );
+        await UserService.awardPoints(userId, POINTS_POST_REACTION_TO_REACTION_CREATOR);
+    }
     return result;
 };
 
 const upVote = async (id, userId) => changeVote(id, userId, 1);
+
 const downVote = async (id, userId) => changeVote(id, userId, -1);
 
 const resetVoteComment = async (id, userId) => {
@@ -141,7 +197,7 @@ const resetVoteComment = async (id, userId) => {
 
         // Before I was give points, then, take then from me.
         await UserService.awardPoints(userId,
-            -1 * POINTS_COMMENT_REACTION_TO_COMMENT_CREATOR); // points reactioner
+            -1 * POINTS_COMMENT_REACTION_TO_REACTION_CREATOR); // points reactioner
     }
 
     const result = await PostModel.update({ _id: post._id, 'comments._id': id }, {
