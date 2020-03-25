@@ -279,6 +279,117 @@ describe('Posts', () => {
         });
     });
 
+    describe('EP27 Coment reaction', async () => {
+        it('should upvote comment successfully', async () => {
+            const postData = {
+                section: sectionId,
+                title: 'Publicación de prueba',
+                description: 'Descripción de la publicación',
+                type: 'Event',
+                startDate: new Date(),
+                endDate: new Date(),
+                isPublic: false,
+            };
+
+            const createRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(postData);
+
+            const postId = createRes.body.data.id;
+            const authorId = createRes.body.data.author.id;
+
+            const commentData = {
+                body: 'Test',
+            };
+
+            const comment = await chai.request(server)
+                .post(`/v1/posts/${postId}/comment`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(commentData);
+
+                const commentId =  comment.body.comment.id;
+
+            const res = await chai.request(server)
+                .post(`/v1/posts/comments/${commentId}/upvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+            res.body.success.should.eql(true);
+        });
+        it('should downvote comment successfully', async () => {
+            const postData = {
+                section: sectionId,
+                title: 'Publicación de prueba',
+                description: 'Descripción de la publicación',
+                type: 'Event',
+                startDate: new Date(),
+                endDate: new Date(),
+                isPublic: false,
+            };
+
+            const createRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(postData);
+
+            const postId = createRes.body.data.id;
+            const authorId = createRes.body.data.author.id;
+
+            const commentData = {
+                body: 'Test',
+            };
+
+            const comment = await chai.request(server)
+                .post(`/v1/posts/${postId}/comment`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(commentData);
+
+                const commentId =  comment.body.comment.id;
+
+            const res = await chai.request(server)
+                .post(`/v1/posts/comments/${commentId}/downvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+            res.body.success.should.eql(true);
+        });
+        it('should reset comment successfully', async () => {
+            const postData = {
+                section: sectionId,
+                title: 'Publicación de prueba',
+                description: 'Descripción de la publicación',
+                type: 'Event',
+                startDate: new Date(),
+                endDate: new Date(),
+                isPublic: false,
+            };
+
+            const createRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(postData);
+
+            const postId = createRes.body.data.id;
+            const authorId = createRes.body.data.author.id;
+
+            const commentData = {
+                body: 'Test',
+            };
+
+            const comment = await chai.request(server)
+                .post(`/v1/posts/${postId}/comment`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(commentData);
+
+                const commentId =  comment.body.comment.id;
+
+            const res = await chai.request(server)
+                .post(`/v1/posts/comments/${commentId}/resetvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+            res.body.success.should.eql(true);
+        });
+    });
+
     after(async () => {
         // Clear created docs
         await PostModel.deleteMany({});
