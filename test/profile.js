@@ -69,6 +69,34 @@ describe('User Profiles', () => {
             res.should.have.status(401);
         });
     });
+    describe('EP28 Update User Profiles (PUT /v1/profile/:id)', () => {
+        it('should update existing user details', async () => {
+            let data = {
+                firstName: 'Prueba',
+                lastName: 'Prueba',
+                email: 'prueba2@prueba.com',
+                password: 'prueba2',
+            };
+
+            res = await chai.request(server)
+                .get(`/v1/profile/${userId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.user.should.be.an('object').with.all.keys('id', 'email', 'firstName', 'lastName', 'points');
+            res.body.user.id.should.eql(userId);
+        });
+
+        it('should return user not found', async () => {
+            const res = await chai.request(server)
+                .get('/v1/profile/5dc1fa9255767b13b48f89d7')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(404);
+        });
+    });
 
     describe('EP14 Get Own Profile (GET /v1/profile)', () => {
         it('should return current user details', async () => {
