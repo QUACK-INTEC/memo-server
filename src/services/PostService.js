@@ -249,7 +249,15 @@ const downVoteComment = async (id, userId) => changeVoteComment(id, userId, -1);
 
 const deletePost = async (id) => PostModel.deleteOne({ _id: id }).lean().exec();
 
-const addSubtask = async (data) => new SubTaskModel(data).save();
+const addSubtask = async (data) => {
+    const post = await PostModel.findById(data.post).lean().exec();
+
+    if (!post) {
+        throw new NotFoundError('Publicacion no encontrada');
+    }
+
+    return new SubTaskModel(data).save();
+};
 
 const updateSubtask = async (data) => {
     const doc = await SubTaskModel.findOneAndUpdate({
