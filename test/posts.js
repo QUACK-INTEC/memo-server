@@ -10,6 +10,7 @@ const {
     UserModel,
     AttachmentModel,
     PostModel,
+    SubTaskModel,
 } = require('../src/models');
 
 const should = chai.should();
@@ -279,8 +280,363 @@ describe('Posts', () => {
         });
     });
 
+    describe('EP21 Create Subtask (POST /v1/posts/:postId/subtask)', () => {
+        it('should create subtask correctly', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const taskData = {
+                name: 'Hacer la tarea',
+            };
+
+            const res = await chai.request(server)
+                .post(`/v1/posts/${postId}/subtask`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(taskData);
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+
+            const newTask = await SubTaskModel.findById(res.body.task.id).exec();
+
+            newTask.name.should.eql(taskData.name);
+            newTask.isDone.should.eql(false);
+            newTask.author._id.toString().should.eql(userId);
+            newTask.post.toString().should.eql(postId);
+        });
+
+        it('should fail for nonexistent post', async () => {
+            const nonexistentPostId = '5dde198fb48188501ae61353';
+            const res = await chai.request(server)
+                .post(`/v1/posts/${nonexistentPostId}/subtask`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    name: 'Hacer la tarea',
+                });
+
+            res.should.have.status(404);
+        });
+    });
+
+    describe('EP22 Update Subtask (PUT /v1/posts/:postId/subtask/:id)', () => {
+        it('should update existing subtask', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const taskData = {
+                name: 'Hacer la tarea',
+            };
+
+            const createRes = await chai.request(server)
+                .post(`/v1/posts/${postId}/subtask`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(taskData);
+
+            const taskId = createRes.body.task.id;
+
+            const updateRes = await chai.request(server)
+                .put(`/v1/posts/${postId}/subtask/${taskId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({ isDone: true });
+
+            updateRes.should.have.status(200);
+
+            const task = await SubTaskModel.findById(taskId).exec();
+            task.isDone.should.eql(true);
+        });
+
+        it('should fail for nonexistent subtask', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const nonexistentTaskId = '5dde198fb48188501ae61353';
+            const res = await chai.request(server)
+                .put(`/v1/posts/${postId}/subtask/${nonexistentTaskId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({ isDone: true });
+
+            res.should.have.status(404);
+        });
+    });
+
+    describe('EP23 Delete Subtasks (DELETE /v1/posts/:postId/subtask/:id)', () => {
+        it('should correctly delete existing subtask', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const taskData = {
+                name: 'Hacer la tarea',
+            };
+
+            const createRes = await chai.request(server)
+                .post(`/v1/posts/${postId}/subtask`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(taskData);
+
+            const taskId = createRes.body.task.id;
+
+            const deleteRes = await chai.request(server)
+                .delete(`/v1/posts/${postId}/subtask/${taskId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            deleteRes.should.have.status(200);
+            deleteRes.body.success.should.eql(true);
+
+            const task = await SubTaskModel.findById(taskId).exec();
+            should.not.exist(task);
+        });
+
+        it('should not delete nonexistent subtask', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const nonexistentTaskId = '5dde198fb48188501ae61353';
+            const res = await chai.request(server)
+                .delete(`/v1/posts/${postId}/subtask/${nonexistentTaskId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(404);
+        });
+    });
+
+    describe('EP24 Create Comment (POST /v1/posts/:postId/comment)', () => {
+        it('should create comment correctly', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const commentData = {
+                body: 'Comentario de Prueba',
+            };
+
+            const res = await chai.request(server)
+                .post(`/v1/posts/${postId}/comment`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(commentData);
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+
+            const post = await PostModel.findById(postId).exec();
+            const newComment = post.comments.id(res.body.comment.id);
+
+            newComment.body.should.eql(commentData.body);
+            newComment.author._id.toString().should.eql(userId);
+        });
+
+        it('should fail for nonexistent post', async () => {
+            const nonexistentPostId = '5dde198fb48188501ae61353';
+            const res = await chai.request(server)
+                .post(`/v1/posts/${nonexistentPostId}/comment`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    body: 'Comentario de Prueba',
+                });
+
+            res.should.have.status(404);
+        });
+    });
+
+    describe('EP25 Delete Comments (DELETE /v1/posts/:postId/comment/:id)', () => {
+        it('should correctly delete existing comments', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const createRes = await chai.request(server)
+                .post(`/v1/posts/${postId}/comment`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    body: 'Comentario de Prueba',
+                });
+
+
+            const commentId = createRes.body.comment.id;
+
+            const res = await chai.request(server)
+                .delete(`/v1/posts/${postId}/comment/${commentId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+
+            const post = await PostModel.findById(postId).exec();
+            const comment = post.comments.id(commentId);
+            should.not.exist(comment);
+        });
+
+        it('should fail deleting nonexistent comment', async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            const postId = postRes.body.data.id;
+
+            const nonexistentCommentId = '5dde198fb48188501ae61353';
+            const res = await chai.request(server)
+                .delete(`/v1/posts/${postId}/comment/${nonexistentCommentId}`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(404);
+        });
+    });
+
+    describe('EP26 - Post Reactions', () => {
+        const totalReactions = (total, current) => total + current.value;
+        let postId = false;
+
+        beforeEach(async () => {
+            const postRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    section: sectionId,
+                    title: 'Publicación de prueba',
+                    description: 'Descripción de la publicación',
+                    type: 'Resource',
+                    isPublic: false,
+                });
+
+            postId = postRes.body.data.id;
+        });
+
+        afterEach(async () => {
+            await chai.request(server).delete(`/v1/posts/${postId}`).set('Authorization', `Bearer ${authToken}`).send();
+        });
+
+        it('should upvote post correctly', async () => {
+            const res = await chai.request(server)
+                .post(`/v1/posts/${postId}/upvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+
+            const post = await PostModel.findById(postId).lean().exec();
+            const score = post.reactions ? post.reactions.reduce(totalReactions, 0) : 0;
+
+            score.should.eql(1);
+        });
+
+        it('should downvote post correctly', async () => {
+            const res = await chai.request(server)
+                .post(`/v1/posts/${postId}/downvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+
+            const post = await PostModel.findById(postId).lean().exec();
+            const score = post.reactions ? post.reactions.reduce(totalReactions, 0) : 0;
+
+            score.should.eql(-1);
+        });
+
+        it('should reset post reaction correctly', async () => {
+            await chai.request(server)
+                .post(`/v1/posts/${postId}/upvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            const res = await chai.request(server)
+                .post(`/v1/posts/${postId}/resetvote`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            res.should.have.status(200);
+            res.body.success.should.eql(true);
+
+            const post = await PostModel.findById(postId).lean().exec();
+            const score = post.reactions ? post.reactions.reduce(totalReactions, 0) : 0;
+
+            score.should.eql(0);
+        });
+    });
+
     after(async () => {
         // Clear created docs
+        await SubTaskModel.deleteMany({});
         await PostModel.deleteMany({});
         await AttachmentModel.deleteMany({});
         await SectionModel.deleteMany({});
