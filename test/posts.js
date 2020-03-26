@@ -314,6 +314,7 @@ describe('Posts', () => {
                 .post(`/v1/posts/comments/${commentId}/upvote`)
                 .set('Authorization', `Bearer ${authToken}`)
                 .send();
+            res.should.have.status(200);
             res.body.success.should.eql(true);
         });
         it('should downvote comment successfully', async () => {
@@ -389,6 +390,48 @@ describe('Posts', () => {
             res.body.success.should.eql(true);
         });
     });
+
+    describe('EP29 Get events', async () => {
+        it('should correctly get events for today details', async () => {
+            const postData = {
+                section: sectionId,
+                title: 'Publicación de prueba',
+                description: 'Descripción de la publicación',
+                type: 'Event',
+                startDate: new Date(),
+                endDate: new Date(),
+                isPublic: false,
+            };
+
+            const createRes = await chai.request(server)
+                .post('/v1/posts')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send(postData);
+
+            const postId = createRes.body.data.id;
+            const authorId = createRes.body.data.author.id;
+
+            const res = await chai.request(server)
+                .get(`/v1/posts/${postId}/events`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+
+            res.should.have.status(404);
+            res.body.should.eql({});
+        });
+
+        it('should error for nonexistent post', async () => {
+            const detailsRes = await chai.request(server)
+                .get('/v1/posts/5dde198fb48188501ae61353')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send();
+
+            detailsRes.should.have.status(404);
+        });
+    });
+
+
 
     after(async () => {
         // Clear created docs
