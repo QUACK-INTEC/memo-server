@@ -58,7 +58,7 @@ describe('File Uploads', () => {
             const prefix = 'memo/att/';
             const fileKey = prefix + res.body.attachments[0].fileURL.split(`/${prefix}`)[1];
             await s3.deleteObject({ Bucket: AWS_S3_BUCKET_NAME, Key: fileKey }).promise();
-        }).timeout(30000);
+        }).timeout(45000);
 
         it('should fail with missing fields', async () => {
             const res = await chai.request(server)
@@ -96,7 +96,7 @@ describe('File Uploads', () => {
             const prefix = 'memo/profile/';
             const fileKey = prefix + res.body.data.avatarURL.split(`/${prefix}`)[1];
             await s3.deleteObject({ Bucket: AWS_S3_BUCKET_NAME, Key: fileKey }).promise();
-        }).timeout(30000);
+        }).timeout(45000);
 
         it('should fail with missing fields', async () => {
             const res = await chai.request(server)
