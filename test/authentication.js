@@ -150,6 +150,50 @@ describe('Authentication', () => {
         });
     });
 
+    describe('EP30 Forgot passwod (POST /v1/auth/forgot)', () => {
+        let token = false;
+
+        it('should fail to find email', async () => {
+            const res = await chai.request(server).post('/v1/auth/forgot')
+                .set('Authorization', `Bearer ${token}`).send({ email: 'fdfga' });
+                
+            res.body.should.be.an('object');
+            res.should.have.status(400);
+        });
+    });
+
+    describe('EP31 OTP (POST /v1/auth/otp)', () => {
+        let token = false;
+
+        it('should not be authorized to check code', async () => {
+            const res = await chai.request(server).post('/v1/auth/otp')
+                .set('Authorization', `Bearer ${token}`).send({ email: 'prueba@prueba.com', password: 'as' });
+
+            res.body.should.be.an('object');
+            res.should.have.status(401);
+
+        });
+    });
+
+    describe('EP32 OTP (POST /v1/auth/reset)', () => {
+
+        it('should reset password sucessfully', async () => {
+    
+            const loginRes = await chai.request(server).post('/v1/auth/login').send({
+                email: 'prueba@prueba.com',
+                password: 'prueba',
+            });
+            let token = loginRes.body.token;
+
+            const res = await chai.request(server).post('/v1/auth/reset')
+                .set('Authorization', `Bearer ${token}`).send({ password: 'new' });
+
+            res.body.should.be.an('object');
+            res.should.have.status(200);
+
+        });
+    });
+
     after(async () => {
         // Clear created docs
         await UserModel.deleteMany({});
