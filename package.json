@@ -28,7 +28,7 @@
     "expo-server-sdk": "^3.4.0",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^5.7.7",
     "mongoose-autopopulate": "^0.9.1",
     "mongoose-lean-virtuals": "^0.5.0",
